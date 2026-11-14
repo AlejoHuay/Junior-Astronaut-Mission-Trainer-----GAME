@@ -7,7 +7,9 @@ Energía, oxígeno y alimentos hacen visibles las renuncias de una misión. Dura
 
 Fase 1 en curso. Última iteración: **F1-04a**, corrección de plantillas web. Próxima: **Validar recorrido web F1-04; después F2-01**.
 Exportación regenerada con plantilla `web_nothreads_release.zip`. Importación, 14 aserciones,
-inicio de escena headless y comprobación de memoria WebAssembly pasan. Pendiente confirmar arranque visual en Edge.
+inicio de escena headless y comprobación de memoria WebAssembly pasan. **Arranque visual confirmado en Edge**:
+tras recargar se muestra el menú «Tu primera base. Un gran reto en Marte.», semilla 214 y botón Comenzar misión.
+Pendiente comprobar el recorrido completo de siete soles en navegador.
 Rama `feat/mission-trainer`; main, origin y commit inicial conservados. Sin push ni merge.
 
 ## Entorno y ejecución
@@ -90,3 +92,4 @@ abstracciones educativas, nunca dosis clínicas ni observaciones de una base mar
 | F1-03 | Dominio tipado, acciones atomicas y balance validado | 14 aserciones headless pasan; determinismo, siete soles y rechazo sin cambios | F1-04: recorrido jugable |
 | F1-04 | Inicio, decisiones, bitacora, final y reinicio; revision visual bloqueada | Importacion, 14 aserciones y exportacion correctas; Computer Use no pudo verificar URL de Edge | Validar recorrido web F1-04; despues F2-01 |
 | F1-04a | Plantillas web sin hilos; instalador corregido y control automático del WASM | Binario anterior rechazado; regenerado aceptado; 14 aserciones, importación, inicio headless y HTTP pasan | Confirmar arranque y recorrido en Edge; después F2-01 |
+| F1-04b | Verificación visual posterior a la corrección | Edge sale de la carga y muestra el menú inicial; observado mediante Computer Use | Recorrido completo de siete soles en navegador; después F2-01 |
