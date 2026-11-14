@@ -83,6 +83,7 @@ func _show_mission() -> void:
 	_label(content, "SOL %d / 7   ·   BASE AURORA" % state.sol, 34)
 	_label(content, "ENERGÍA  %d / %d     |     OXÍGENO  %d     |     ALIMENTOS  %d" % [state.energy, session.rules.config.battery_capacity, state.oxygen, state.food], 26, ACCENT)
 	_label(content, "Hallazgos: %d  ·  Unidades de juego, no medidas reales" % state.science, 17, MUTED)
+	_label(content, "INVERNADERO · %d / %d soles de cuidado. Cosecha: +%d alimentos.\nTiempo comprimido para jugar: las plantas reales no crecen en dos días. Una tarea distinta pierde el progreso del ciclo." % [state.crop_progress, session.rules.config.crop_turns, session.rules.config.harvest_food], 18, MUTED)
 	status = _label(content, "Elige un plan de energía para este sol. Después del trabajo: oxígeno −%d, alimentos −%d y producción solar +%d (hasta llenar la batería)." % [session.rules.config.oxygen_per_sol, session.rules.config.food_per_sol, session.rules.config.solar_per_sol], 20)
 	if state.phase == MissionState.Phase.FINISHED:
 		_label(content, state.outcome, 28)
@@ -121,17 +122,28 @@ func _history() -> String:
 		lines.append("Sol %d · %s: energía %+d, oxígeno %+d, comida %+d, hallazgos %+d" % [entry.sol, session.rules.config.actions[entry.action].label, entry.energy, entry.oxygen, entry.food, entry.science])
 		var budget: Dictionary = entry.budget
 		lines.append("  Energía: −%d trabajo +%d solar almacenada (%d sin espacio). Oxígeno: +%d producido −%d consumo." % [budget.cost, budget.solar_stored, budget.solar_spilled, budget.oxygen_produced, budget.oxygen_consumed])
+		lines.append("  Alimentos: +%d cosecha −%d consumo. %s" % [budget.crop.harvest, budget.food_consumed, _crop_text(budget.crop)])
 	return "\n".join(lines)
 
 func _preview_text(preview: Dictionary) -> String:
 	if not preview.ok:
 		return "No disponible: " + str(preview.reason)
-	var text := "Asignación: aire %d + ciencia %d = %d de energía.\nProduce %d de oxígeno y %d hallazgos.\nAl cerrar el sol: energía %d · oxígeno %d · comida %d." % [preview.allocation.life_support, preview.allocation.science, preview.cost, preview.oxygen_produced, preview.science_gained, preview.energy_after, preview.oxygen_after, preview.food_after]
+	var text := "Asignación: aire %d + ciencia %d + cultivo %d = %d de energía.\nProduce %d de oxígeno y %d hallazgos.\nAl cerrar el sol: energía %d · oxígeno %d · comida %d." % [preview.allocation.life_support, preview.allocation.science, preview.allocation.greenhouse, preview.cost, preview.oxygen_produced, preview.science_gained, preview.energy_after, preview.oxygen_after, preview.food_after]
+	text += "\n" + _crop_text(preview.crop)
 	if preview.solar_spilled > 0:
 		text += "\nBatería llena: %d de energía solar no se almacenan." % preview.solar_spilled
 	if preview.oxygen_after == 0 or preview.food_after == 0:
 		text += "\n¡Atención! Este plan agota una reserva y termina la misión."
 	return text
+
+func _crop_text(crop: Dictionary) -> String:
+	if crop.interrupted:
+		return "Cultivo interrumpido: pierdes el progreso y la energía invertida no se devuelve."
+	if crop.harvest > 0:
+		return "Cosecha este sol: +%d alimentos antes del consumo." % crop.harvest
+	if crop.remaining > 0:
+		return "Cosecha prevista al cerrar sol %d si cuidas %d sol(es) más sin interrupción." % [crop.due_sol, crop.remaining]
+	return "Sin cosecha pendiente."
 
 func _show_sources() -> void:
 	_page()

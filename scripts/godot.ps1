@@ -25,7 +25,10 @@ switch ($Task) {
     'version' { & $godotExe --headless --version }
     'import' { Invoke-Godot @('--headless','--editor','--import') }
     'run' { Invoke-Godot @() }
-    'test' { Invoke-Godot @('--headless','--script','res://tests/run_tests.gd') }
+    'test' {
+        Invoke-Godot @('--headless','--script','res://tests/run_tests.gd')
+        Invoke-Godot @('--headless','--script','res://tests/smoke_scene.gd')
+    }
     'export' {
         New-Item -ItemType Directory -Force build/web | Out-Null
         Invoke-Godot @('--headless','--export-release','Web','build/web/index.html')

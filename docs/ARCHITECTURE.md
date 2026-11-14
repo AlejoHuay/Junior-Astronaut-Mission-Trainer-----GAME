@@ -4,13 +4,15 @@
 `GameData` valida y lee JSON en infraestructura. La aplicación coordina reglas/proveedores
 y emite señales; la presentación no modifica directamente los recursos.
 
-## Orden de resolución (F2-01)
+## Orden de resolución (F2-02)
 
 1. Validar fase, identificador de sol esperado, acción y recursos; rechazo sin mutación.
-2. Calcular presupuesto conocido sin mutar estado ni RNG. Sumar asignaciones de soporte vital y ciencia;
+2. Calcular presupuesto conocido sin mutar estado ni RNG. Sumar asignaciones de soporte vital, ciencia e invernadero;
    comprobar que la batería actual cubre el trabajo antes de cualquier recarga.
 3. Entrar en resolución; cobrar acción, aplicar oxígeno/ciencia.
-4. Consumir oxígeno y comida del sol; recargar batería limitada. Registrar producción solar almacenada
+4. Avanzar cultivo con energía al invernadero; sin ella, perder el progreso. Al completar el ciclo,
+   sumar cosecha y reiniciar progreso. Después consumir oxígeno y comida; recargar batería limitada.
+   Registrar producción solar almacenada
    y excedente que no cabe. Recursos agotados se limitan a cero.
 5. Comprobar escasez antes de victoria; registrar diferencias y presupuesto desglosado, terminar o avanzar sol.
 
@@ -18,7 +20,7 @@ La vista previa y la resolución comparten el presupuesto del dominio. La vista 
 turnos ni cambia semilla, RNG o historial. En F2-01 todos los efectos son conocidos; cuando se añadan
 eventos inciertos no deberán anticiparse tiradas ni mostrarse resultados futuros como certezas.
 
-Cada acción JSON define `allocation.life_support` y `allocation.science`; su suma es el costo,
+Cada acción JSON define `allocation.life_support`, `allocation.science` y `allocation.greenhouse`; su suma es el costo,
 sin un segundo campo duplicado. Planes discretos para evitar sobrecargar a niños con deslizadores:
 aire 4/0, ciencia 0/3, ambos 3/3, reserva 0/0. El plan combinado consume seis y solo recupera cuatro,
 de modo que repetirlo reduce la batería. Reservar no produce oxígeno ni ciencia, consume reservas
@@ -29,3 +31,18 @@ y recuperación gratuita sin producción. Costos y rendimientos son unidades edu
 Los números son unidades de juego. Semilla y estado RNG se conservan como cadenas decimales
 en snapshots para evitar pérdida de precisión de enteros de 64 bits al serializar JSON.
 El identificador de turno evita aplicar dos veces una orden retrasada.
+
+## Cultivos y abstracción educativa
+
+F2-02 empieza con 5 alimentos: siete soles consumen 7, por lo que hace falta al menos una cosecha.
+`crop_turns=2` y `harvest_food=4` son balance ficticio. Cuidar consume 3 de energía y un sol de trabajo,
+sin oxígeno ni ciencia producidos. Dos cuidados consecutivos entregan 4 alimentos antes del consumo
+del segundo sol. El primer cuidado no entrega comida. Después se puede iniciar un nuevo ciclo.
+Otra acción durante un cultivo pierde el progreso, sin reembolso de energía; una acción rechazada
+no avanza el tiempo ni destruye el cultivo. La previsión de cosecha incluye sol y condición de continuar.
+Un cultivo iniciado el sol 7 anuncia cosecha en el sol 8, fuera de la misión; no se acelera al terminar.
+
+`crop_progress` forma parte del snapshot; el presupuesto e historial guardan cosecha, interrupción,
+progreso siguiente y fecha condicionada. La futura persistencia deberá conservarlo.
+Esta compresión no representa tiempos agrícolas reales ni implica que cualquier interrupción real
+mate plantas: simplifica la necesidad de mantener condiciones y dedicar trabajo continuado.
