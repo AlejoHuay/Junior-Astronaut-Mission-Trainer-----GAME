@@ -1,4 +1,6 @@
-[gd_scene format=3]
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/presentation/mission_screen.gd" id="1"]
 
 [node name="MissionTrainer" type="Control"]
 layout_mode = 3
@@ -7,11 +9,4 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="Title" type="Label" parent="."]
-offset_left = 80.0
-offset_top = 80.0
-offset_right = 1100.0
-offset_bottom = 220.0
-theme_override_font_sizes/font_size = 40
-text = "JUNIOR ASTRONAUT\nPreparando la misión a Marte…"
+script = ExtResource("1")

@@ -5,8 +5,8 @@ Energía, oxígeno y alimentos hacen visibles las renuncias de una misión. Dura
 
 ## Estado actual
 
-Fase 1 en curso. Última iteración: **F1-03**. Próxima: **F1-04: recorrido jugable**.
-Estado de esta iteración: Dominio tipado, acciones atomicas y balance validado. Verificación: 14 aserciones headless pasan; determinismo, siete soles y rechazo sin cambios.
+Fase 1 en curso. Última iteración: **F1-04**. Próxima: **Validar recorrido web F1-04; despues F2-01**.
+Estado de esta iteración: Inicio, decisiones, bitacora, final y reinicio; revision visual bloqueada. Verificación: Importacion, 14 aserciones y exportacion correctas; Computer Use no pudo verificar URL de Edge.
 Rama `feat/mission-trainer`; main, origin y commit inicial conservados. Sin push ni merge.
 
 ## Entorno y ejecución
@@ -31,17 +31,36 @@ Para otra máquina: descargar las plantillas **4.7.2** desde el archivo oficial 
 ## Arquitectura y funcionalidades
 
 Dominio independiente → aplicación → adaptadores de archivos y presentación Godot.
-Completado: inspección, rama y documentación. Pendiente: simulación, interfaz, ciencia archivada,
-guardado, pruebas y paquete web. [Plan completo](docs/PLAN.md) · [Desafío](docs/CHALLENGE.md).
+Completado: inspección, rama, documentación, proyecto Compatibility, núcleo determinista, inicio,
+misión con dos acciones, resultado, reinicio y exportación web. Parcial: recorrido mínimo sin revisión
+visual en navegador. Pendiente: sistemas Fase 2, ciencia archivada, presentación Fase 3 y guardado Fase 4.
+[Plan completo](docs/PLAN.md) · [Desafío](docs/CHALLENGE.md) · [Arquitectura](docs/ARCHITECTURE.md).
 
 ## Verificación y problemas conocidos
 
 Comprobados: árbol inicial limpio, main siguiendo origin/main, remoto esperado, `26d25ed first commit`,
-Godot 4.7.2 ejecutable. No se ejecutaron pruebas de juego ni navegador.
+Godot 4.7.2 ejecutable. Ejecutadas 14 aserciones headless: todas pasan, incluyendo siete soles,
+determinismo, rechazo atómico y órdenes duplicadas. Importación y exportación release posteriores
+a la interfaz también pasan. No se completó una partida visual en navegador.
 Una búsqueda inicial no encontró Godot en PATH; el usuario proporcionó después la instalación correcta.
 Un intento anterior de descarga falló y no instaló otro motor. Se obtuvo la plantilla web mediante
 rangos HTTP del paquete oficial; descarga completa detenida. Importación y exportación release pasan.
 En el entorno restringido, Godot necesitó acceso a sus cachés normales; con ese acceso no hubo errores.
+Ambas plantillas web release/debug se descargaron y comprobaron como ZIP íntegros.
+El host de automatización de navegador no está disponible; el intento alternativo de usar Edge
+fue detenido por Computer Use al no poder determinar con confianza su URL. No es un error
+demostrado del juego. **Fase 1 pendiente de aceptación visual**, y Fases 2–4 aún no implementadas.
+
+### Comprobación manual pendiente
+
+1. En VS Code, define `$env:GODOT_BIN` con tu ejecutable Godot 4.7.2 instalado.
+2. Ejecuta `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 verify`.
+3. Ejecuta `python -m http.server 8060 --bind 127.0.0.1 --directory build/web` si no está ya activo.
+4. Abre `http://127.0.0.1:8060` en Edge. Inicia con semilla 214 y alterna renovar oxígeno / investigar
+   durante siete soles, comenzando y terminando con oxígeno. Comprueba resultado, reinicio y fuentes.
+5. Revisa Tab/Enter, textos y controles. Registrar el resultado antes de cerrar Fase 1.
+
+El paquete actual está en `build/web`, excluido de Git. No se publicó en internet.
 
 ## Datos científicos
 
@@ -58,3 +77,4 @@ abstracciones educativas, nunca dosis clínicas ni observaciones de una base mar
 | F1-01 | Rama, README, AGENTS, PLAN y CHALLENGE | Git y versión de Godot comprobados; documentos revisados | F1-02: entorno y exportación |
 | F1-02 | Proyecto Compatibility, tareas VS Code y exportacion web sin hilos | Importacion y exportacion release correctas con Godot 4.7.2 | F1-03: nucleo de simulacion |
 | F1-03 | Dominio tipado, acciones atomicas y balance validado | 14 aserciones headless pasan; determinismo, siete soles y rechazo sin cambios | F1-04: recorrido jugable |
+| F1-04 | Inicio, decisiones, bitacora, final y reinicio; revision visual bloqueada | Importacion, 14 aserciones y exportacion correctas; Computer Use no pudo verificar URL de Edge | Validar recorrido web F1-04; despues F2-01 |
