@@ -5,15 +5,16 @@ Energía, oxígeno y alimentos hacen visibles las renuncias de una misión. Dura
 
 ## Estado actual
 
-Fase 1 en curso. Última iteración: **F1-04**. Próxima: **Validar recorrido web F1-04; despues F2-01**.
-Estado de esta iteración: Inicio, decisiones, bitacora, final y reinicio; revision visual bloqueada. Verificación: Importacion, 14 aserciones y exportacion correctas; Computer Use no pudo verificar URL de Edge.
+Fase 1 en curso. Última iteración: **F1-04a**, corrección de plantillas web. Próxima: **Validar recorrido web F1-04; después F2-01**.
+Exportación regenerada con plantilla `web_nothreads_release.zip`. Importación, 14 aserciones,
+inicio de escena headless y comprobación de memoria WebAssembly pasan. Pendiente confirmar arranque visual en Edge.
 Rama `feat/mission-trainer`; main, origin y commit inicial conservados. Sin push ni merge.
 
 ## Entorno y ejecución
 
 Godot **4.7.2.stable.official.ed1daf0bf**, instalación existente indicada por el usuario; versión comprobada
 con `--headless --version`. VS Code para edición, Git y Python 3.13 para utilidades.
-Proyecto Compatibility creado. Plantilla web release 4.7.2 instalada en `.tools/templates` (ignorada).
+Proyecto Compatibility creado. Plantilla web sin hilos 4.7.2 instalada en `.tools/templates` (ignorada).
 Los archivos compartidos usan `GODOT_BIN` o `godot` en PATH. En la terminal de VS Code define
 `$env:GODOT_BIN` con la ruta de tu ejecutable instalado, preferiblemente la variante `_console.exe`.
 
@@ -27,6 +28,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 export
 También disponibles como tareas de VS Code. La política Bypass se aplica solo a ese proceso.
 Para otra máquina: descargar las plantillas **4.7.2** desde el archivo oficial Godot y ejecutar
 `python scripts/install_templates.py ruta/al/archivo.tpz`. El preset usa las dos plantillas locales.
+Deben ser `web_nothreads_debug.zip` y `web_nothreads_release.zip`: las variantes `web_debug.zip`
+y `web_release.zip` llevan hilos. La exportación comprueba ahora la memoria del binario WebAssembly
+con `python scripts/check_web_export.py build/web`; falla si requiere memoria compartida.
 
 ## Arquitectura y funcionalidades
 
@@ -48,15 +52,22 @@ rangos HTTP del paquete oficial; descarga completa detenida. Importación y expo
 En el entorno restringido, Godot necesitó acceso a sus cachés normales; con ese acceso no hubo errores.
 Ambas plantillas web release/debug se descargaron y comprobaron como ZIP íntegros.
 El host de automatización de navegador no está disponible; el intento alternativo de usar Edge
-fue detenido por Computer Use al no poder determinar con confianza su URL. No es un error
-demostrado del juego. **Fase 1 pendiente de aceptación visual**, y Fases 2–4 aún no implementadas.
+fue detenido por Computer Use al no poder determinar con confianza su URL.
+Después, la captura del usuario confirmó un bloqueo real: `DataCloneError`, transferencia de
+`SharedArrayBuffer` sin `crossOriginIsolated`. Causa: se habían seleccionado plantillas explícitas
+con hilos, aunque el preset desactivaba hilos. Corregido en F1-04a usando las variantes `web_nothreads`.
+La comprobación nueva rechazó el binario anterior y aceptó el regenerado; HTTP 200 sirve exactamente
+el WASM corregido. No se cambiaron cabeceras ni protecciones del navegador.
+Referencia técnica: [exportador oficial Godot 4.7.2](https://raw.githubusercontent.com/godotengine/godot/4.7.2-stable/platform/web/export/export_plugin.cpp).
+**Fase 1 pendiente de aceptación visual**, y Fases 2–4 aún no implementadas.
 
 ### Comprobación manual pendiente
 
 1. En VS Code, define `$env:GODOT_BIN` con tu ejecutable Godot 4.7.2 instalado.
 2. Ejecuta `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 verify`.
 3. Ejecuta `python -m http.server 8060 --bind 127.0.0.1 --directory build/web` si no está ya activo.
-4. Abre `http://127.0.0.1:8060` en Edge. Inicia con semilla 214 y alterna renovar oxígeno / investigar
+4. Abre `http://127.0.0.1:8060` en Edge y recarga con **Ctrl+Shift+R** para descartar archivos antiguos.
+   Inicia con semilla 214 y alterna renovar oxígeno / investigar
    durante siete soles, comenzando y terminando con oxígeno. Comprueba resultado, reinicio y fuentes.
 5. Revisa Tab/Enter, textos y controles. Registrar el resultado antes de cerrar Fase 1.
 
@@ -78,3 +89,4 @@ abstracciones educativas, nunca dosis clínicas ni observaciones de una base mar
 | F1-02 | Proyecto Compatibility, tareas VS Code y exportacion web sin hilos | Importacion y exportacion release correctas con Godot 4.7.2 | F1-03: nucleo de simulacion |
 | F1-03 | Dominio tipado, acciones atomicas y balance validado | 14 aserciones headless pasan; determinismo, siete soles y rechazo sin cambios | F1-04: recorrido jugable |
 | F1-04 | Inicio, decisiones, bitacora, final y reinicio; revision visual bloqueada | Importacion, 14 aserciones y exportacion correctas; Computer Use no pudo verificar URL de Edge | Validar recorrido web F1-04; despues F2-01 |
+| F1-04a | Plantillas web sin hilos; instalador corregido y control automático del WASM | Binario anterior rechazado; regenerado aceptado; 14 aserciones, importación, inicio headless y HTTP pasan | Confirmar arranque y recorrido en Edge; después F2-01 |

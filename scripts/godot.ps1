@@ -29,6 +29,8 @@ switch ($Task) {
     'export' {
         New-Item -ItemType Directory -Force build/web | Out-Null
         Invoke-Godot @('--headless','--export-release','Web','build/web/index.html')
+        python scripts/check_web_export.py build/web
+        if ($LASTEXITCODE -ne 0) { throw 'La exportacion web no cumple el requisito sin hilos.' }
     }
     'verify' {
         & $PSCommandPath import

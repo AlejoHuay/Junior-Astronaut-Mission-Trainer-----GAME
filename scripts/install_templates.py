@@ -12,7 +12,7 @@ with ZipFile(args.archive) as archive:
     if version != "4.7.2.stable":
         raise SystemExit(f"Expected 4.7.2.stable, got {version}")
     target.mkdir(parents=True, exist_ok=True)
-    for name in ("web_debug.zip", "web_release.zip"):
+    for name in ("web_nothreads_debug.zip", "web_nothreads_release.zip"):
         (target / name).write_bytes(archive.read(f"templates/{name}"))
         with ZipFile(target / name) as template:
             if template.testzip() is not None:
