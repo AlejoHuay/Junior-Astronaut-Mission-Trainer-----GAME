@@ -46,3 +46,13 @@ Un cultivo iniciado el sol 7 anuncia cosecha en el sol 8, fuera de la misión; n
 progreso siguiente y fecha condicionada. La futura persistencia deberá conservarlo.
 Esta compresión no representa tiempos agrícolas reales ni implica que cualquier interrupción real
 mate plantas: simplifica la necesidad de mantener condiciones y dedicar trabajo continuado.
+
+## Protección (F2-03)
+
+Cada acción tiene ubicación interior, exterior o refugio. El refugio protege durante el sol a cambio
+del turno, consumo de reservas y posible interrupción del cultivo; su blindaje no consume electricidad.
+Reforzar gasta dos materiales y un turno; la protección interior se evalúa antes de instalar la mejora,
+por lo que debe prepararse antes de una alerta. Nunca protege una salida exterior.
+Explorar gasta un oxígeno extra del traje y dos de energía para tres hallazgos. Una decisión sin
+protección durante alerta detiene la misión por protocolo educativo, sin dosis ni consecuencias clínicas.
+F2-03 prueba alertas inyectadas; F2-04 las conectará con eventos de la misión.

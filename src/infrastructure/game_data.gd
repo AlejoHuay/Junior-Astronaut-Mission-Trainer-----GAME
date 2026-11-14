@@ -20,12 +20,12 @@ func validate_balance(value: Dictionary) -> bool:
 			return false
 	if not value.get("initial") is Dictionary or not value.get("actions") is Dictionary:
 		return false
-	for key in ["energy", "oxygen", "food"]:
+	for key in ["energy", "oxygen", "food", "materials"]:
 		if not _positive_integer(value.initial.get(key)):
 			return false
 	if value.crop_turns < 2 or value.crop_turns > value.mission_sols:
 		return false
-	for key in ["support", "research", "grow"]:
+	for key in ["support", "research", "grow", "shelter", "reinforce", "eva"]:
 		if not value.actions.get(key) is Dictionary:
 			return false
 	for action in value.actions.values():
@@ -43,12 +43,18 @@ func validate_balance(value: Dictionary) -> bool:
 			return false
 		if not action.get("label") is String or not action.get("description") is String:
 			return false
-		for key in ["oxygen", "science"]:
+		for key in ["oxygen", "science", "materials", "extra_oxygen"]:
 			if action.has(key) and (not _number(action[key]) or action[key] < 0 or action[key] > 1000):
 				return false
 		if action.get("oxygen", 0) > 0 and action.allocation.life_support == 0:
 			return false
 		if action.get("science", 0) > 0 and action.allocation.science == 0:
+			return false
+		if action.get("location", "inside") not in ["inside", "outside", "shelter"]:
+			return false
+		if not action.get("reinforce", false) is bool:
+			return false
+		if action.get("reinforce", false) and action.get("materials", 0) <= 0:
 			return false
 	if not value.actions.has("reserve"):
 		return false

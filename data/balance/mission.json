@@ -6,12 +6,15 @@
     "food_per_sol": 1,
     "crop_turns": 2,
     "harvest_food": 4,
-    "initial": {"energy": 8, "oxygen": 7, "food": 5},
+    "initial": {"energy": 8, "oxygen": 7, "food": 5, "materials": 2},
     "actions": {
         "support": {"label": "Renovar oxígeno", "allocation": {"life_support": 4, "science": 0, "greenhouse": 0}, "oxygen": 5, "description": "Prioriza el aire de la base. Hoy renuncias a investigar."},
         "research": {"label": "Investigar Marte", "allocation": {"life_support": 0, "science": 3, "greenhouse": 0}, "science": 2, "description": "Prioriza los hallazgos. Hoy no produces oxígeno."},
         "combined": {"label": "Repartir entre ambos", "allocation": {"life_support": 3, "science": 3, "greenhouse": 0}, "oxygen": 3, "science": 2, "description": "Produce aire e investiga, pero gasta más energía de la que recargan los paneles."},
         "reserve": {"label": "Reservar energía", "allocation": {"life_support": 0, "science": 0, "greenhouse": 0}, "description": "No activas sistemas de trabajo. Recargas la batería, pero consumes reservas y pierdes un sol de investigación."},
-        "grow": {"label": "Cuidar el cultivo", "allocation": {"life_support": 0, "science": 0, "greenhouse": 3}, "description": "Dedica energía y trabajo al invernadero. Debes cuidarlo en soles consecutivos; otra tarea interrumpe el ciclo y pierde el progreso. Hoy no produces oxígeno ni investigas."}
+        "grow": {"label": "Cuidar el cultivo", "allocation": {"life_support": 0, "science": 0, "greenhouse": 3}, "description": "Dedica energía y trabajo al invernadero. Debes cuidarlo en soles consecutivos; otra tarea interrumpe el ciclo y pierde el progreso. Hoy no produces oxígeno ni investigas."},
+        "shelter": {"label": "Entrar al refugio", "allocation": {"life_support": 0, "science": 0, "greenhouse": 0}, "location": "shelter", "description": "Te proteges durante este sol. Sin trabajo científico ni producción de oxígeno; interrumpes cultivos. El blindaje pasivo no consume electricidad."},
+        "reinforce": {"label": "Reforzar el interior", "allocation": {"life_support": 0, "science": 0, "greenhouse": 0}, "reinforce": true, "materials": 2, "description": "Usa 2 materiales y este sol de trabajo. Desde el próximo sol permite trabajar dentro durante alertas. No protege las salidas ni consume electricidad por sí mismo."},
+        "eva": {"label": "Explorar el exterior", "allocation": {"life_support": 0, "science": 2, "greenhouse": 0}, "location": "outside", "science": 3, "extra_oxygen": 1, "description": "Gana 3 hallazgos con 2 de energía, pero gasta 1 oxígeno extra del traje. Durante una alerta solar se detiene la misión por seguridad, incluso con interior reforzado."}
     }
 }

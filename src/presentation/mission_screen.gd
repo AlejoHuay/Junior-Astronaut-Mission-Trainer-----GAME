@@ -83,6 +83,7 @@ func _show_mission() -> void:
 	_label(content, "SOL %d / 7   ·   BASE AURORA" % state.sol, 34)
 	_label(content, "ENERGÍA  %d / %d     |     OXÍGENO  %d     |     ALIMENTOS  %d" % [state.energy, session.rules.config.battery_capacity, state.oxygen, state.food], 26, ACCENT)
 	_label(content, "Hallazgos: %d  ·  Unidades de juego, no medidas reales" % state.science, 17, MUTED)
+	_label(content, "PROTECCIÓN · %s · Materiales disponibles: %d\n%s" % ["Interior reforzado" if state.reinforced else "Refugio disponible; interior sin refuerzo", state.materials, "ALERTA SOLAR: refugio o trabajo interior con refuerzo previo. Salir detiene la misión." if state.solar_alert else "Sin alerta solar este sol. El refugio ocupa tu turno de trabajo."], 18, MUTED)
 	_label(content, "INVERNADERO · %d / %d soles de cuidado. Cosecha: +%d alimentos.\nTiempo comprimido para jugar: las plantas reales no crecen en dos días. Una tarea distinta pierde el progreso del ciclo." % [state.crop_progress, session.rules.config.crop_turns, session.rules.config.harvest_food], 18, MUTED)
 	status = _label(content, "Elige un plan de energía para este sol. Después del trabajo: oxígeno −%d, alimentos −%d y producción solar +%d (hasta llenar la batería)." % [session.rules.config.oxygen_per_sol, session.rules.config.food_per_sol, session.rules.config.solar_per_sol], 20)
 	if state.phase == MissionState.Phase.FINISHED:
@@ -130,6 +131,10 @@ func _preview_text(preview: Dictionary) -> String:
 		return "No disponible: " + str(preview.reason)
 	var text := "Asignación: aire %d + ciencia %d + cultivo %d = %d de energía.\nProduce %d de oxígeno y %d hallazgos.\nAl cerrar el sol: energía %d · oxígeno %d · comida %d." % [preview.allocation.life_support, preview.allocation.science, preview.allocation.greenhouse, preview.cost, preview.oxygen_produced, preview.science_gained, preview.energy_after, preview.oxygen_after, preview.food_after]
 	text += "\n" + _crop_text(preview.crop)
+	if preview.materials_used > 0:
+		text += "\nMateriales: −%d. La mejora protege desde el próximo sol." % preview.materials_used
+	if preview.safety_stop:
+		text += "\n¡ALERTA! Sin protección suficiente: este plan detiene la misión por seguridad."
 	if preview.solar_spilled > 0:
 		text += "\nBatería llena: %d de energía solar no se almacenan." % preview.solar_spilled
 	if preview.oxygen_after == 0 or preview.food_after == 0:

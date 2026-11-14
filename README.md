@@ -5,9 +5,11 @@ Energía, oxígeno y alimentos hacen visibles las renuncias de una misión. Dura
 
 ## Estado actual
 
-**Fase 1 completada; Fase 2 en curso.** Última iteración: **F2-02**, alimentos e invernadero.
-Implementación y verificación automatizada completas; **revisión visual de F2-02 pendiente**.
-Próxima tarea: comprobar el cultivo en navegador; siguiente implementación: **F2-03: protección y actividad exterior**.
+**Fase 1 completada; Fase 2 en curso.** Última iteración: **F2-03**, protección y actividad exterior.
+El usuario confirmó en navegador la cosecha **5 → 4 → 7** de F2-02.
+Próxima implementación: **F2-04: eventos y comunicaciones**. Refugio, refuerzo limitado por materiales
+y salidas con consumo extra de oxígeno implementados. Pruebas de protección, suite y escenas pasan;
+exportación web sin hilos correcta. Las alertas se inyectaron en pruebas; su calendario llega en F2-04.
 Cinco planes de asignación. Cuidar el cultivo cuesta 3 de energía por sol; dos cuidados consecutivos
 entregan 4 alimentos antes del consumo del segundo sol. Otra tarea pierde el progreso sin reembolso.
 Reservas iniciales: energía 8, oxígeno 7 y alimentos 5. Al menos una cosecha es necesaria para siete soles.
@@ -134,3 +136,4 @@ agrícolas observados ni implican que cualquier interrupción real destruya plan
 | F1-04c | Cierre documental de Fase 1 | Usuario confirma ambos finales en Edge y protocolo satisfactorio; sin nuevas pruebas de código | F2-01: energía y soporte vital |
 | F2-01 | Asignaciones aire/ciencia, plan combinado y reserva, presupuesto previo, excedente solar y bitácora desglosada | 112 aserciones; importación/exportación sin hilos; tres decisiones verificadas en Edge con escasez y recuperación | F2-02: alimentos e invernadero |
 | F2-02 | Cultivo con costo, cosecha diferida, interrupción, reservas iniciales 5 y compresión temporal documentada | 154 aserciones y prueba de escenas pasan; importación/exportación sin hilos; revisión visual bloqueada por geometría de Computer Use | Revisar cultivo en navegador; F2-03: protección y actividad exterior |
+| F2-03 | Refugio, refuerzo con 2 materiales y trabajo, salidas con oxígeno extra y parada de seguridad | Suite, escenas y exportación sin hilos pasan; cultivo 5 → 4 → 7 validado por usuario | F2-04: eventos y comunicaciones |

@@ -37,6 +37,7 @@ func _initialize() -> void:
 	check(not data.validate_balance(bad), "Malformed balance rejected")
 	test_energy_budget(config, data)
 	test_crops(config, data)
+	test_protection(config)
 	print("Tests: %d assertions, %d failures" % [assertions, failures])
 	quit(1 if failures else 0)
 
@@ -147,3 +148,31 @@ func test_crops(config: Dictionary, data: GameData) -> void:
 	var free_crop := config.duplicate(true)
 	free_crop.actions.grow.allocation.greenhouse = 0
 	check(not data.validate_balance(free_crop), "Free cultivation rejected")
+
+func test_protection(config: Dictionary) -> void:
+	var rules := MissionRules.new(config)
+	var state := rules.start(214)
+	state.solar_alert = true
+	var plan := rules.preview(state, "shelter")
+	check(plan.cost == 0 and plan.protected and not plan.safety_stop and plan.science_gained == 0, "Passive shelter protects at cost of work, not electricity")
+	rules.resolve(state, "shelter", 1)
+	check(state.sheltered and state.phase == MissionState.Phase.DECISION and state.oxygen == 5, "Shelter still consumes oxygen and food")
+	state = rules.start(214)
+	rules.resolve(state, "reinforce", 1)
+	check(state.reinforced and state.materials == 0, "Reinforcement spends limited materials and turn")
+	check(not rules.preview(state, "reinforce").ok, "Upgrade cannot be repeated")
+	state.solar_alert = true
+	check(not rules.preview(state, "support").safety_stop, "Prior reinforcement protects indoor work")
+	check(rules.preview(state, "eva").safety_stop, "Interior shielding does not protect outside work")
+	state = rules.start(214)
+	state.solar_alert = true
+	check(rules.preview(state, "reinforce").safety_stop, "Cannot install shielding retroactively during alert")
+	rules.resolve(state, "eva", 1)
+	check(state.safety_stop and state.phase == MissionState.Phase.FINISHED, "Unsafe EVA stops mission without clinical model")
+	state = rules.start(214)
+	rules.resolve(state, "eva", 1)
+	check(state.science == 3 and state.oxygen == 4, "EVA rewards science but consumes extra suit oxygen")
+	state = rules.start(214)
+	state.materials = 1
+	var before := state.snapshot()
+	check(not rules.resolve(state, "reinforce", 1).ok and state.snapshot() == before, "Insufficient materials rejected atomically")
