@@ -39,6 +39,7 @@ func _initialize() -> void:
 	test_crops(config, data)
 	test_protection(config)
 	test_events_and_radio(config, data)
+	test_phase_two_strategies(config)
 	print("Tests: %d assertions, %d failures" % [assertions, failures])
 	quit(1 if failures else 0)
 
@@ -157,7 +158,7 @@ func test_protection(config: Dictionary) -> void:
 	var plan := rules.preview(state, "shelter")
 	check(plan.cost == 0 and plan.protected and not plan.safety_stop and plan.science_gained == 0, "Passive shelter protects at cost of work, not electricity")
 	rules.resolve(state, "shelter", 1)
-	check(state.sheltered and state.phase == MissionState.Phase.DECISION and state.oxygen == 5, "Shelter still consumes oxygen and food")
+	check(state.sheltered and state.phase == MissionState.Phase.DECISION and state.oxygen == 4, "Shelter consumes oxygen, transfer oxygen and food")
 	state = rules.start(214)
 	rules.resolve(state, "reinforce", 1)
 	check(state.reinforced and state.materials == 0, "Reinforcement spends limited materials and turn")
@@ -225,3 +226,51 @@ func test_events_and_radio(config: Dictionary, data: GameData) -> void:
 	check(not data.validate_events(bad, 7), "Unknown event rejected")
 	bad.scenarios.demo.timeline[0] = ["solar"]
 	check(not data.validate_events(bad, 7), "Unannounced random solar alerts rejected")
+
+func test_phase_two_strategies(config: Dictionary) -> void:
+	var fixtures: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tests/strategies.json"))
+	var results: Dictionary = {}
+	for scenario in ["training", "demo", "exploration"]:
+		for seed_value in [1, 77, 214, 999]:
+			for strategy in fixtures:
+				var rules := MissionRules.new(config)
+				var state := rules.start(seed_value, scenario)
+				for action in fixtures[strategy]:
+					check(rules.resolve(state, action, state.sol).ok, "%s/%s/%d action resolves" % [scenario, strategy, seed_value])
+				check(state.outcome_code == "success" and state.history.size() == 7, "%s/%s/%d survives seven sols" % [scenario, strategy, seed_value])
+				if scenario == "demo" and seed_value == 214:
+					results[strategy] = state
+					print("Strategy %s: energy=%d oxygen=%d food=%d science=%d materials=%d" % [strategy, state.energy, state.oxygen, state.food, state.science, state.materials])
+	check(results.scientific.science > results.cautious.science and results.scientific.oxygen < results.cautious.oxygen, "More science sacrifices oxygen reserves")
+	check(results.reinforced.materials == 0 and results.cautious.materials == 2, "Working inside during alert costs upgrade materials")
+	check(results.radio.science == 0 and results.radio.oxygen > results.cautious.oxygen, "Waiting for advice trades science for later oxygen")
+	var rules := MissionRules.new(config)
+	check(rules.summary(results.scientific).science_goal and rules.summary(results.scientific).sample_goal, "Scientific strategy earns optional goals")
+	check(not rules.summary(results.cautious).science_goal and rules.summary(results.cautious).success, "Optional science never gates survival victory")
+	var food_failure := rules.start(214)
+	for index in range(5):
+		rules.resolve(food_failure, "support", food_failure.sol)
+	check(food_failure.outcome_code == "food", "Food shortage has a specific ending")
+	var oxygen_failure := rules.start(214)
+	for index in range(4):
+		rules.resolve(oxygen_failure, "research", oxygen_failure.sol)
+	check(oxygen_failure.outcome_code == "oxygen", "Oxygen shortage has a specific ending")
+	var unsafe := rules.start(214)
+	unsafe.sol = 7
+	unsafe.solar_alert = true
+	rules.resolve(unsafe, "eva", 7)
+	check(unsafe.outcome_code == "safety", "Safety failure takes precedence over last-sol victory")
+	var expired := rules.start(214)
+	expired.sol = 7
+	expired.food = 1
+	rules.resolve(expired, "support", 7)
+	check(expired.outcome_code == "food", "Reserve failure takes precedence over last-sol victory")
+	var before := expired.snapshot()
+	check(not rules.resolve(expired, "grow", 7).ok and expired.snapshot() == before, "Final state remains immutable to new decisions")
+	var variants: Dictionary = {}
+	for seed_value in range(1, 21):
+		var state := rules.start(seed_value, "exploration")
+		rules.resolve(state, "grow", 1)
+		rules.resolve(state, "grow", 2)
+		variants[state.current_event] = true
+	check(variants.size() > 1, "Different seeds actually change uncertain events")

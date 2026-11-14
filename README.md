@@ -1,129 +1,118 @@
 # Junior Astronaut Mission Trainer
 
-Juego educativo 2D para edades 7–12: administra una base en Marte durante 7 soles simulados.
-Energía, oxígeno y alimentos hacen visibles las renuncias de una misión. Duración objetivo: 5–10 minutos.
+Juego educativo 2D individual para edades 7–12: administra una base en Marte durante 7 soles simulados.
+Energía, oxígeno y alimentos hacen visibles las renuncias de una misión. Duración objetivo: 5–10 minutos,
+pendiente de medir con jugadores. Interfaz en español, sin cuentas ni APIs durante la partida.
 
 ## Estado actual
 
-**Fase 1 completada; Fase 2 en curso.** Última iteración: **F2-04**, eventos y comunicaciones.
-El usuario confirmó en navegador la cosecha **5 → 4 → 7** de F2-02.
-Próxima implementación: **F2-05: objetivos, finales y balance integral**. Polvo, avería persistente,
-reparación local y alertas anunciadas están conectados al juego. La radio tarda dos soles en entregar
-consejo de uso único, sin suministros instantáneos. **284 aserciones**, escenas y exportación sin hilos pasan.
-El juego inicia ahora en Misión Aurora: polvo sol 3, alerta sol 4 y avería sol 6. El protocolo anterior
-sin refugio corresponde al entrenamiento tranquilo; se actualizará con el selector de escenarios F2-05.
-Cinco planes de asignación. Cuidar el cultivo cuesta 3 de energía por sol; dos cuidados consecutivos
-entregan 4 alimentos antes del consumo del segundo sol. Otra tarea pierde el progreso sin reembolso.
-Reservas iniciales: energía 8, oxígeno 7 y alimentos 5. Al menos una cosecha es necesaria para siete soles.
-Importación, **154 aserciones**, prueba de escenas headless, exportación y control del WASM sin hilos pasan.
-Estas pruebas se ejecutaron antes de la pausa; al retomar se revisaron los cambios y el registro de escenas,
-sin repetir pruebas de código para el cierre documental. La validación manual anterior corresponde
-a Fase 1 y F2-01, no a una partida completa de esta nueva versión.
+**Fases 1 y 2 implementadas. Última iteración: F2-05.** Los criterios funcionales de Fase 2 están
+cubiertos por pruebas: cinco sistemas, costos, consecuencias diferidas, varias estrategias y orden
+de resolución. **Revisión visual final de Fase 2 pendiente** por bloqueo de Computer Use.
+Siguiente fase de desarrollo: **F3-01 — DONKI histórico verificable**.
+
+F2-03 añade refugio, refuerzo con materiales y actividad exterior; F2-04 conecta polvo, avería,
+alerta solar y radio diferida; F2-05 añade objetivos opcionales, finales explicados, escenarios y balance.
+El usuario confirmó previamente la cosecha 5 → 4 → 7 de F2-02. Esa confirmación no se presenta como
+validación manual de las nuevas pantallas o partidas completas de Fase 2.
 Rama `feat/mission-trainer`; main, origin y commit inicial conservados. Sin push ni merge.
 
 ## Entorno y ejecución
 
-Godot **4.7.2.stable.official.ed1daf0bf**, instalación existente indicada por el usuario; versión comprobada
-con `--headless --version`. VS Code para edición, Git y Python 3.13 para utilidades.
-Proyecto Compatibility creado. Plantilla web sin hilos 4.7.2 instalada en `.tools/templates` (ignorada).
-Los archivos compartidos usan `GODOT_BIN` o `godot` en PATH. En la terminal de VS Code define
-`$env:GODOT_BIN` con la ruta de tu ejecutable instalado, preferiblemente la variante `_console.exe`.
+Godot **4.7.2.stable.official.ed1daf0bf**, instalación existente del usuario, sin descargar otro motor.
+VS Code, Git y Python 3.13. Renderer Compatibility; exportación web sin hilos.
+Define `$env:GODOT_BIN` en la terminal con tu ejecutable Godot instalado (preferiblemente `_console.exe`).
+No hay rutas personales en las tareas compartidas.
 
 Comandos comprobados desde la raíz:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 import
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 test
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 export
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 verify
+python -m http.server 8060 --bind 127.0.0.1 --directory build/web
 ```
 
-También disponibles como tareas de VS Code. La política Bypass se aplica solo a ese proceso.
-Para otra máquina: descargar las plantillas **4.7.2** desde el archivo oficial Godot y ejecutar
-`python scripts/install_templates.py ruta/al/archivo.tpz`. El preset usa las dos plantillas locales.
-Deben ser `web_nothreads_debug.zip` y `web_nothreads_release.zip`: las variantes `web_debug.zip`
-y `web_release.zip` llevan hilos. La exportación comprueba ahora la memoria del binario WebAssembly
-con `python scripts/check_web_export.py build/web`; falla si requiere memoria compartida.
+También disponibles en tareas de VS Code. Bypass se aplica solo al proceso de PowerShell.
+Abre **http://127.0.0.1:8060/** y recarga con Ctrl+Shift+R. Si el servidor ya está activo, no inicies otro.
+Elige escenario y semilla; en cada sol selecciona un plan, revisa sus consecuencias y pulsa ejecutar.
+La bitácora se despliega con su botón. Con teclado: Tab, flechas para seleccionar y Enter para activar.
+
+Plantillas locales ignoradas: `.tools/templates/web_nothreads_debug.zip` y `web_nothreads_release.zip`.
+En otra máquina descarga las plantillas oficiales **4.7.2** y ejecuta
+`python scripts/install_templates.py ruta/al/archivo.tpz`. No usar `web_debug.zip`/`web_release.zip`,
+que llevan hilos. Cada exportación ejecuta `python scripts/check_web_export.py build/web` y rechaza
+un WASM con memoria compartida. Paquete generado: `build/web`, fuera de Git; no publicado.
 
 ## Arquitectura y funcionalidades
 
-Dominio independiente → aplicación → adaptadores de archivos y presentación Godot.
-Completado: inspección, rama, documentación, proyecto Compatibility, núcleo determinista, inicio,
-misión, resultado, reinicio y exportación web; energía y soporte vital de F2-01 e invernadero de F2-02.
-Cinco planes definidos en JSON asignan energía a aire, ciencia y cultivo; la bitácora desglosa gasto,
-recarga, excedente solar, oxígeno, cosecha, consumo de comida e interrupciones.
-Reservar cuesta un sol y reservas aunque no gasta energía. El plan combinado agota la batería si se repite.
-Pendiente: revisión visual de F2-02, F2-03 a F2-05, ciencia archivada, presentación Fase 3 y guardado Fase 4.
-[Plan completo](docs/PLAN.md) · [Desafío](docs/CHALLENGE.md) · [Arquitectura](docs/ARCHITECTURE.md).
+Dominio RefCounted sin UI, archivos ni red; aplicación coordina acciones y señales; infraestructura
+valida JSON; presentación ofrece controles y explicaciones. Semilla y RNG propios por misión,
+órdenes protegidas por sol esperado y snapshots preparados para la futura persistencia.
+[Arquitectura](docs/ARCHITECTURE.md) · [Plan](docs/PLAN.md) · [Desafío](docs/CHALLENGE.md).
 
-## Verificación y problemas conocidos
+- Energía: asignaciones, batería limitada, producción solar, excedente y vista previa sin mutaciones.
+- Oxígeno: producción y consumo; salidas y traslado al refugio consumen una unidad extra del equipo.
+- Comida: reservas iniciales 5, cultivo por dos cuidados consecutivos de 3 energía cada uno,
+  cosecha +4 antes del consumo. Interrupción pierde progreso sin reembolso; tiempo ficticio acelerado.
+- Protección: refugio ocupa turno; refuerzo gasta 2 materiales y trabajo previo. Blindaje sin gasto eléctrico.
+- Radio: consulta cuesta energía y turno; consejo dos soles después, mejora una producción local de oxígeno.
+  Sin suministros instantáneos, sin llamadas a internet durante partida.
+- Entorno: polvo reduce solar; avería resta producción hasta reparar; alerta solar anunciada un sol antes.
+- Misión: tres escenarios, objetivos opcionales de ciencia y muestra exterior, finales específicos,
+  resumen basado en historial, reinicio y bitácora. La ciencia opcional no es condición de supervivencia.
 
-Comprobados: árbol inicial limpio, main siguiendo origin/main, remoto esperado, `26d25ed first commit`,
-Godot 4.7.2 ejecutable. Ejecutadas 14 aserciones headless: todas pasan, incluyendo siete soles,
-determinismo, rechazo atómico y órdenes duplicadas. Importación y exportación release posteriores
-a la interfaz también pasan. El usuario completó ambos finales en Edge y confirmó el resultado satisfactorio
-del protocolo manual. No se atribuye esta prueba manual al agente ni se afirma una prueba de usabilidad
-con niños o una duración de partida medida. En F2-01 se amplió y ejecutó la suite a 112 aserciones:
-límites 0–12 de batería, excedente solar, recuperación, producción antes de consumo, escasez,
-asignaciones inválidas, vista previa sin mutaciones y coincidencia con resolución. Todas pasan.
-La revisión visual F2-01 cubre inicio y tres decisiones en Edge; no se ha validado diseño móvil,
-lectores de pantalla, diversión ni balance final. En ventanas pequeñas, bitácora y navegación requieren
-desplazamiento vertical; la presentación definitiva sigue prevista en F3-03.
-F2-02 amplía la suite a 154 aserciones: cosecha diferida, interrupción sin reembolso, reinicio del ciclo,
-rechazo sin mutación, cosecha antes de consumo, escasez y prevención de cosechas duplicadas.
-La prueba `tests/smoke_scene.gd`, integrada en la tarea `test`, recorrió menú, cultivo, cosecha,
-interrupción, resultado y fuentes sin errores de scripts. Headless no demuestra legibilidad.
-El intento de revisión visual F2-02 quedó bloqueado al seleccionar la pestaña de Edge:
-Computer Use devolvió `coordinate input geometry is unavailable`. No se registró como prueba aprobada.
-Una búsqueda inicial no encontró Godot en PATH; el usuario proporcionó después la instalación correcta.
-Un intento anterior de descarga falló y no instaló otro motor. Se obtuvo la plantilla web mediante
-rangos HTTP del paquete oficial; descarga completa detenida. Importación y exportación release pasan.
-En el entorno restringido, Godot necesitó acceso a sus cachés normales; con ese acceso no hubo errores.
-Ambas plantillas web release/debug se descargaron y comprobaron como ZIP íntegros.
-El host de automatización de navegador estuvo inicialmente indisponible; el primer intento alternativo
-de usar Edge fue detenido por Computer Use al no poder determinar con confianza su URL. Posteriormente
-el agente pudo observar el menú inicial en Edge tras corregir la exportación.
-Después, la captura del usuario confirmó un bloqueo real: `DataCloneError`, transferencia de
-`SharedArrayBuffer` sin `crossOriginIsolated`. Causa: se habían seleccionado plantillas explícitas
-con hilos, aunque el preset desactivaba hilos. Corregido en F1-04a usando las variantes `web_nothreads`.
-La comprobación nueva rechazó el binario anterior y aceptó el regenerado; HTTP 200 sirve exactamente
-el WASM corregido. No se cambiaron cabeceras ni protecciones del navegador.
-Referencia técnica: [exportador oficial Godot 4.7.2](https://raw.githubusercontent.com/godotengine/godot/4.7.2-stable/platform/web/export/export_plugin.cpp).
-**Fase 1 aceptada con la confirmación manual del usuario. F2-01 verificada; F2-02 verificada en headless.**
-Fase 2 sigue abierta: faltan revisión visual de cultivos, protección, eventos, comunicaciones y balance integral.
+Pendientes de Fases 3–4: datos NASA archivados, base visual definitiva, audio y accesibilidad ampliada,
+tutorial completo, guardado/carga y entrega final. No hay persistencia todavía; recargar reinicia la partida.
 
-### Protocolo manual para futuras regresiones
+## Verificación y balance
 
-1. En VS Code, define `$env:GODOT_BIN` con tu ejecutable Godot 4.7.2 instalado.
-2. Ejecuta `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 verify`.
-3. Ejecuta `python -m http.server 8060 --bind 127.0.0.1 --directory build/web` si no está ya activo.
-4. Abre `http://127.0.0.1:8060` en Edge y recarga con **Ctrl+Shift+R** para descartar archivos antiguos.
-   Inicia con semilla 214. Para completar la misión con el balance F2-02, elige:
-   **cultivo, cultivo, oxígeno, investigar, oxígeno, investigar, oxígeno**.
-   Debes terminar con energía 12, oxígeno 8, alimentos 2 y 4 hallazgos. Comprueba resultado, reinicio y fuentes.
-5. Reinicia y elige investigar cuatro veces para comprobar el final por agotamiento de oxígeno.
-6. Revisa fuentes, regreso al juego, Tab/Enter, textos y controles. Registrar cualquier regresión.
-7. Para F2-01, inicia una partida y elige **Repartir entre ambos** dos veces: al sol 3 debes tener
-   energía 4, oxígeno 9 y alimentos 3; el plan combinado queda deshabilitado con déficit 2.
-8. Elige **Reservar energía**: al sol 4 debes tener energía 8, oxígeno 7, alimentos 2 y 4 hallazgos.
-   Compara la vista previa y la bitácora. El flujo energético se comprobó en Edge en F2-01;
-   los valores de alimentos de este protocolo corresponden al nuevo balance F2-02.
-9. Para comprobar la cosecha, reinicia: el primer cuidado deja alimentos 4 y progreso 1/2;
-   el segundo deja alimentos 7 y progreso 0/2. La cosecha suma 4 y el consumo resta 1.
-10. Para comprobar interrupción, reinicia y elige cultivo seguido de oxígeno. Antes de cambiar
-    debe verse la advertencia; después el progreso debe ser 0/2, alimentos 3 y energía 9.
-    Estos casos están probados en headless; su comprobación visual sigue pendiente.
+**679 aserciones aprobadas**, prueba de escenas y controles aprobada, importación y exportación web
+sin hilos correctas. La suite cubre restricciones, recursos, cosechas, interrupciones, seguridad,
+radio diferida/uso único, determinismo, semilla variable, órdenes duplicadas y prioridad de finales.
+La prueba de escena completa la estrategia científica usando selector y botón de ejecución,
+comprueba victoria con 5 hallazgos, abre fuentes y regresa al menú.
 
-El paquete actual está en `build/web`, excluido de Git. No se publicó en internet.
+**48 partidas automatizadas completas:** 4 estrategias × 3 escenarios × 4 semillas.
+Resultados de Aurora con semilla 214:
+
+| Estrategia | Energía | Oxígeno | Alimentos | Ciencia | Materiales |
+|---|---:|---:|---:|---:|---:|
+| Cautelosa | 9 | 7 | 2 | 2 | 2 |
+| Científica | 8 | 4 | 2 | 5 | 2 |
+| Reforzada | 6 | 6 | 2 | 4 | 0 |
+| Radio | 8 | 9 | 2 | 0 | 2 |
+
+Secuencias, costos y límites de estas conclusiones: [BALANCE.md](docs/BALANCE.md).
+Más ciencia sacrifica reservas; reforzar gasta materiales; esperar consejo sacrifica ciencia.
+Estas pruebas no demuestran diversión, equilibrio óptimo ni duración de 5–10 minutos con niños.
+
+## Revisión manual y problemas conocidos
+
+Confirmados en versiones anteriores: menú en Edge por el agente; ambos finales de Fase 1 y cosecha
+5 → 4 → 7 por el usuario; restricciones energéticas F2-01 por el agente. La revisión visual final
+de Fase 2 se intentó, pero Computer Use detuvo la sesión porque no pudo determinar con confianza
+la URL actual de Edge. No se declara esa revisión como aprobada. Sigue pendiente [este protocolo](docs/BALANCE.md#protocolo-manual-final-pendiente).
+
+Prueba rápida de Aurora/214: **cultivo, cultivo, oxígeno, refugio, ambos, exterior, oxígeno**.
+Final esperado: energía 8, oxígeno 4, alimentos 2, ciencia 5 y una muestra exterior.
+La estrategia antigua sin cultivar o sin refugio no completa este escenario. Entrenamiento tranquilo
+sirve para probar cultivo sin alertas. Radio: consultar en sol 5, observar espera en 6 y consejo en 7.
+
+En ventanas pequeñas puede ser necesario desplazarse; diseño móvil y lectores de pantalla no validados.
+No se detectaron errores de scripts en las pruebas actuales. No se hizo auditoría de rendimiento integral.
+El bloqueo anterior `SharedArrayBuffer` se corrigió con plantillas sin hilos y se controla automáticamente.
+El entorno restringido requiere acceso a cachés normales de Godot para importar sin errores de permisos.
 
 ## Datos científicos
 
 [DONKI](https://ccmc.gsfc.nasa.gov/tools/DONKI/),
 [OSDR](https://osdr.nasa.gov/bio/repo/search?q=&data_source=cgene,alsda,esa&data_type=study),
 [RadLab](https://visualization.osdr.nasa.gov/radlab/gui/data-api/).
-Aún no se incorporaron registros científicos. No hay respaldo NASA. Los valores del juego serán
-abstracciones educativas, nunca dosis clínicas ni observaciones de una base marciana real.
-Los dos soles de cultivo y la pérdida total de progreso son simplificaciones de juego: no son tiempos
-agrícolas observados ni implican que cualquier interrupción real destruya plantas. Véase arquitectura.
+Aún no hay registros reales incorporados: **todos los eventos de Fase 2 son ficticios**. El juego no
+está avalado por NASA. Los valores de balance no son dosis, riesgos clínicos ni observaciones de Marte.
+Cultivo acelerado, oxígeno de traslado y dos soles de radio son abstracciones educativas, no mediciones.
 
 ## Registro de iteraciones
 
@@ -140,3 +129,4 @@ agrícolas observados ni implican que cualquier interrupción real destruya plan
 | F2-02 | Cultivo con costo, cosecha diferida, interrupción, reservas iniciales 5 y compresión temporal documentada | 154 aserciones y prueba de escenas pasan; importación/exportación sin hilos; revisión visual bloqueada por geometría de Computer Use | Revisar cultivo en navegador; F2-03: protección y actividad exterior |
 | F2-03 | Refugio, refuerzo con 2 materiales y trabajo, salidas con oxígeno extra y parada de seguridad | Suite, escenas y exportación sin hilos pasan; cultivo 5 → 4 → 7 validado por usuario | F2-04: eventos y comunicaciones |
 | F2-04 | Catálogo validado de eventos, polvo, avería/reparación, aviso solar y radio con consejo diferido | 284 aserciones; escenas; exportación sin hilos; determinismo y entrega única comprobados | F2-05: objetivos, finales y balance |
+| F2-05 | Objetivos opcionales, finales específicos, selector de escenarios/planes y comparación de estrategias | 679 aserciones, 48 partidas y controles/escenas pasan; exportación sin hilos; revisión visual final bloqueada por URL de Edge | Verificación visual pendiente; F3-01: DONKI histórico |

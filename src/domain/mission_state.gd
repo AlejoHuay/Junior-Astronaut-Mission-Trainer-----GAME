@@ -28,6 +28,8 @@ var mission_seed: int = 0
 var rng_state: int = 0
 var history: Array[Dictionary] = []
 var outcome: String = ""
+var outcome_code: String = ""
+var samples: int = 0
 
 func snapshot() -> Dictionary:
 	return {"phase": phase, "sol": sol, "energy": energy, "oxygen": oxygen,
@@ -39,4 +41,5 @@ func snapshot() -> Dictionary:
 		"radio_sent": radio_sent, "advice_ready": advice_ready, "radio_message": radio_message,
 		"pending": pending.duplicate(true),
 		"seed": str(mission_seed), "rng": str(rng_state),
-		"history": history.duplicate(true), "outcome": outcome}
+		"history": history.duplicate(true), "outcome": outcome, "outcome_code": outcome_code,
+		"samples": samples}

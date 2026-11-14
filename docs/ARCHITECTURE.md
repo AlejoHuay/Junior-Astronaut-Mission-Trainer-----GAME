@@ -53,6 +53,8 @@ Cada acción tiene ubicación interior, exterior o refugio. El refugio protege d
 del turno, consumo de reservas y posible interrupción del cultivo; su blindaje no consume electricidad.
 Reforzar gasta dos materiales y un turno; la protección interior se evalúa antes de instalar la mejora,
 por lo que debe prepararse antes de una alerta. Nunca protege una salida exterior.
+En F2-05, trasladarse al refugio cuesta un oxígeno extra del equipo (balance ficticio), diferenciándolo
+de reservar energía en calma. Este gasto no se atribuye al blindaje pasivo.
 Explorar gasta un oxígeno extra del traje y dos de energía para tres hallazgos. Una decisión sin
 protección durante alerta detiene la misión por protocolo educativo, sin dosis ni consecuencias clínicas.
 F2-04 conecta las alertas con los eventos de misión.
@@ -72,3 +74,16 @@ El consejo no modifica reservas al llegar: mejora en dos una futura producción 
 Los pendientes permanecen registrados si vencen después del final; nunca se adelantan para premiar al jugador.
 Estos tiempos, rendimientos y eventos son balance ficticio, no latencias reales ni datos NASA.
 `pending`, `radio_sent`, `advice_ready`, avería, evento actual, escenario y RNG pertenecen al snapshot.
+
+## Finales, objetivos y presentación (F2-05)
+
+`outcome_code` separa éxito, parada de seguridad, oxígeno agotado, alimentos agotados y ambos agotados.
+Seguridad y escasez se comprueban antes de victoria en el séptimo sol; mensajes en JSON de balance.
+Objetivos opcionales: `science_goal` hallazgos y una muestra exterior segura. No bloquean la victoria.
+El resumen calcula cosechas, interrupciones y refugios desde el historial; no inventa consecuencias.
+
+La presentación ofrece selector de escenario/semilla y un selector de planes. Seleccionar no consume
+el turno: muestra costos y restricciones, y el botón de ejecución envía el sol esperado al dominio.
+Los planes imposibles pueden seleccionarse para leer el motivo, pero no ejecutarse. La bitácora es
+desplegable. Datos ambientales, cultivo, radio y protección son estados contextuales; se mantienen
+solo tres reservas principales. Los efectos pendientes no se adelantan al terminar la misión.

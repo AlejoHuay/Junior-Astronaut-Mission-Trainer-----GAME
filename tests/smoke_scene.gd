@@ -9,12 +9,16 @@ func exercise_scene() -> void:
 	var screen = packed.instantiate()
 	root.add_child(screen)
 	await process_frame
-	screen.session.start(214, "training")
-	for action in ["grow", "grow", "support", "grow", "support", "research", "support"]:
-		screen.session.choose(action, screen.session.state.sol)
+	screen.session.start(214, "demo")
+	for action in ["grow", "grow", "support", "shelter", "combined", "eva", "support"]:
+		for index in range(screen.action_picker.item_count):
+			if screen.action_picker.get_item_metadata(index) == action:
+				screen.action_picker.select(index)
+				screen._action_selected(index)
+		screen.execute_button.pressed.emit()
 		await process_frame
-	if screen.session.state.phase != MissionState.Phase.FINISHED:
-		printerr("FAIL: scene did not reach the mission result")
+	if screen.session.state.outcome_code != "success" or screen.session.state.science != 5:
+		printerr("FAIL: presentation controls did not complete the scientific strategy")
 		quit(1)
 		return
 	screen._show_sources()
@@ -23,5 +27,5 @@ func exercise_scene() -> void:
 	await process_frame
 	screen.queue_free()
 	await process_frame
-	print("Scene smoke: menu, cultivation, harvest, interruption, result and sources loaded")
+	print("Scene smoke: scenario menu, plan selector, preview, execution, alert, objectives, result and sources loaded")
 	quit(0)

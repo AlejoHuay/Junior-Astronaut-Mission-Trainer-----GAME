@@ -25,11 +25,16 @@ func load_balance(path: String = "res://data/balance/mission.json") -> Dictionar
 	return parsed
 
 func validate_balance(value: Dictionary) -> bool:
-	for key in ["mission_sols", "battery_capacity", "solar_per_sol", "oxygen_per_sol", "food_per_sol", "crop_turns", "harvest_food", "communication_delay", "advice_oxygen_bonus", "panel_fault_loss"]:
+	for key in ["mission_sols", "battery_capacity", "solar_per_sol", "oxygen_per_sol", "food_per_sol", "crop_turns", "harvest_food", "communication_delay", "advice_oxygen_bonus", "panel_fault_loss", "science_goal"]:
 		if not _positive_integer(value.get(key)):
 			return false
 	if not value.get("initial") is Dictionary or not value.get("actions") is Dictionary:
 		return false
+	if not value.get("outcomes") is Dictionary:
+		return false
+	for code in ["success", "safety", "oxygen", "food", "oxygen_food"]:
+		if not value.outcomes.get(code) is String or value.outcomes[code].is_empty():
+			return false
 	for key in ["energy", "oxygen", "food", "materials"]:
 		if not _positive_integer(value.initial.get(key)):
 			return false

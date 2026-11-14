@@ -8,7 +8,13 @@ const ACCENT := Color("74e0c2")
 var session: MissionSession
 var content: VBoxContainer
 var status: Label
-var actions: GridContainer
+var selected_action: String = "support"
+var action_picker: OptionButton
+var action_detail: Label
+var action_preview: Label
+var execute_button: Button
+var scenario_picker: OptionButton
+var scenario_description: Label
 var log_text: Label
 var seed_input: SpinBox
 
@@ -57,7 +63,7 @@ func _page() -> void:
 		margin.add_theme_constant_override("margin_" + edge, 28)
 	scroll.add_child(margin)
 	content = VBoxContainer.new()
-	content.add_theme_constant_override("separation", 16)
+	content.add_theme_constant_override("separation", 10)
 	margin.add_child(content)
 	_label(content, "JUNIOR ASTRONAUT   /   CONTROL DE MISIÓN", 17, ACCENT)
 
@@ -72,52 +78,83 @@ func _show_menu() -> void:
 	seed_input.value = 214
 	seed_input.prefix = "Semilla de misión: "
 	content.add_child(seed_input)
-	var start_button := _button(content, "Comenzar misión  →", func(): session.start(int(seed_input.value)))
+	scenario_picker = OptionButton.new()
+	scenario_picker.custom_minimum_size.y = 48
+	content.add_child(scenario_picker)
+	for scenario_id in session.rules.config.scenarios:
+		scenario_picker.add_item(session.rules.config.scenarios[scenario_id].label)
+		scenario_picker.set_item_metadata(scenario_picker.item_count - 1, scenario_id)
+		if scenario_id == "demo":
+			scenario_picker.select(scenario_picker.item_count - 1)
+	scenario_description = _label(content, "", 19, MUTED)
+	scenario_picker.item_selected.connect(_scenario_selected)
+	_scenario_selected(scenario_picker.selected)
+	var start_button := _button(content, "Comenzar misión  →", func():
+		selected_action = "support"
+		session.start(int(seed_input.value), str(scenario_picker.get_item_metadata(scenario_picker.selected))))
 	start_button.grab_focus()
 	_button(content, "Fuentes y créditos", _show_sources)
 	_label(content, "Simulación educativa • Sin cuentas • Sin conexión durante la partida", 17, MUTED)
 
+func _scenario_selected(index: int) -> void:
+	var id: String = scenario_picker.get_item_metadata(index)
+	scenario_description.text = session.rules.config.scenarios[id].description
+
 func _show_mission() -> void:
 	_page()
 	var state := session.state
-	_label(content, "SOL %d / 7   ·   BASE AURORA" % state.sol, 34)
+	_label(content, "SOL %d / 7 · %s · Semilla %d" % [state.sol, session.rules.config.scenarios[state.scenario_id].label, state.mission_seed], 28)
 	_label(content, "ENERGÍA  %d / %d     |     OXÍGENO  %d     |     ALIMENTOS  %d" % [state.energy, session.rules.config.battery_capacity, state.oxygen, state.food], 26, ACCENT)
-	_label(content, "Hallazgos: %d  ·  Unidades de juego, no medidas reales" % state.science, 17, MUTED)
+	_label(content, "Opcionales: hallazgos %d / %d · Muestras exteriores %d / 1. Sobrevivir completa la misión." % [state.science, session.rules.config.science_goal, state.samples], 17, MUTED)
 	var event: Dictionary = session.rules.config.events[state.current_event]
-	_label(content, "ENTORNO · %s — %s\n%s" % [event.label, event.description, "Aviso: alerta solar prevista para el próximo sol. Prepara protección." if state.next_solar_alert else "Eventos ficticios de entrenamiento, no observaciones NASA."], 18, ACCENT)
+	_label(content, "ENTORNO · %s — %s%s" % [event.label, event.description, "\n¡Mañana hay alerta solar! Prepara protección." if state.next_solar_alert else ""], 18, ACCENT)
 	var radio_text := state.radio_message if not state.radio_message.is_empty() else "Sin consulta enviada. Una respuesta tarda %d soles simulados." % session.rules.config.communication_delay
 	_label(content, "RADIO · " + radio_text, 18, MUTED)
-	_label(content, "PROTECCIÓN · %s · Materiales disponibles: %d\n%s" % ["Interior reforzado" if state.reinforced else "Refugio disponible; interior sin refuerzo", state.materials, "ALERTA SOLAR: refugio o trabajo interior con refuerzo previo. Salir detiene la misión." if state.solar_alert else "Sin alerta solar este sol. El refugio ocupa tu turno de trabajo."], 18, MUTED)
-	_label(content, "INVERNADERO · %d / %d soles de cuidado. Cosecha: +%d alimentos.\nTiempo comprimido para jugar: las plantas reales no crecen en dos días. Una tarea distinta pierde el progreso del ciclo." % [state.crop_progress, session.rules.config.crop_turns, session.rules.config.harvest_food], 18, MUTED)
-	status = _label(content, "Elige un plan para este sol. Consumo base: oxígeno −%d, alimentos −%d. Solar disponible: %d.\nLa vista previa incluye lo conocido de este sol; los eventos futuros inciertos no están incluidos." % [session.rules.config.oxygen_per_sol, session.rules.config.food_per_sol, maxi(0, state.solar_output - (int(session.rules.config.panel_fault_loss) if state.panel_fault else 0))], 20)
+	_label(content, "BASE · %s · Materiales %d · Paneles: %s" % ["Interior reforzado" if state.reinforced else "Refugio listo; interior sin refuerzo", state.materials, "averiados" if state.panel_fault else "operativos"], 18, MUTED)
+	_label(content, "CULTIVO · %d / %d cuidados consecutivos → +%d comida. Tiempo acelerado ficticio; otra tarea pierde el progreso." % [state.crop_progress, session.rules.config.crop_turns, session.rules.config.harvest_food], 18, MUTED)
+	status = _label(content, "Consumo base: oxígeno −%d, comida −%d · Solar disponible: %d. Vista previa solo del sol actual." % [session.rules.config.oxygen_per_sol, session.rules.config.food_per_sol, maxi(0, state.solar_output - (int(session.rules.config.panel_fault_loss) if state.panel_fault else 0))], 18)
 	if state.phase == MissionState.Phase.FINISHED:
 		_label(content, state.outcome, 28)
+		var result := session.rules.summary(state)
+		_label(content, "Objetivos opcionales: ciencia %s · muestra exterior %s.\nCosechaste %d alimentos; interrumpiste %d cultivo(s); usaste refugio %d sol(es).\nConsejos aún pendientes al finalizar: %d. No se adelantan ni llegan suministros." % ["lograda" if result.science_goal else "pendiente", "lograda" if result.sample_goal else "pendiente", result.harvested, result.interruptions, result.shelter_turns, result.pending_count], 20, MUTED)
 		_button(content, "Volver a planear", _show_menu).grab_focus()
 	else:
-		actions = GridContainer.new()
-		actions.columns = 2
-		actions.add_theme_constant_override("h_separation", 14)
-		actions.add_theme_constant_override("v_separation", 12)
-		content.add_child(actions)
+		_label(content, "1. ELIGE UN PLAN   ·   2. REVISA   ·   3. EJECUTA", 18, ACCENT)
+		action_picker = OptionButton.new()
+		action_picker.custom_minimum_size.y = 48
+		content.add_child(action_picker)
 		for action_id in session.rules.config.actions:
 			var action: Dictionary = session.rules.config.actions[action_id]
 			var check := session.rules.preview(state, action_id)
-			var card := VBoxContainer.new()
-			card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			actions.add_child(card)
-			var button := _button(card, action.label, session.choose.bind(action_id, state.sol))
-			button.disabled = not check.ok
-			_label(card, action.description, 18, MUTED)
-			_label(card, _preview_text(check), 18, ACCENT if check.ok else Color("ffca88"))
-			if check.ok and not get_viewport().gui_get_focus_owner():
-				button.grab_focus()
-	_label(content, "BITÁCORA · Qué cambió y por qué", 20, ACCENT)
+			action_picker.add_item(action.label + (" · no disponible" if not check.ok else ""))
+			action_picker.set_item_metadata(action_picker.item_count - 1, action_id)
+			if action_id == selected_action:
+				action_picker.select(action_picker.item_count - 1)
+		action_detail = _label(content, "", 18, MUTED)
+		action_preview = _label(content, "", 18, ACCENT)
+		var expected_sol: int = state.sol
+		execute_button = _button(content, "Ejecutar plan y terminar sol →", func(): session.choose(selected_action, expected_sol))
+		action_picker.item_selected.connect(_action_selected)
+		_action_selected(action_picker.selected)
+		action_picker.grab_focus()
+		if not state.history.is_empty():
+			var last: Dictionary = state.history.back()
+			_label(content, "Último sol · %s: energía %+d, oxígeno %+d, comida %+d, ciencia %+d." % [session.rules.config.actions[last.action].label, last.energy, last.oxygen, last.food, last.science], 18, MUTED)
+	_button(content, "Mostrar / ocultar bitácora completa", func(): log_text.visible = not log_text.visible)
 	log_text = _label(content, _history(), 18, MUTED)
+	log_text.visible = state.phase == MissionState.Phase.FINISHED
 	var navigation := HBoxContainer.new()
 	navigation.add_theme_constant_override("separation", 12)
 	content.add_child(navigation)
 	_button(navigation, "Fuentes", _show_sources)
 	_button(navigation, "Menú", _show_menu)
+
+func _action_selected(index: int) -> void:
+	selected_action = str(action_picker.get_item_metadata(index))
+	var check := session.rules.preview(session.state, selected_action)
+	action_detail.text = session.rules.config.actions[selected_action].description
+	action_preview.text = _preview_text(check)
+	execute_button.disabled = not check.ok
 
 func _history() -> String:
 	if session.state.history.is_empty():
@@ -143,6 +180,10 @@ func _preview_text(preview: Dictionary) -> String:
 		text += "\nMateriales locales: −%d." % preview.materials_used
 	if preview.radio_due_sol > 0:
 		text += "\nConsejo pendiente hasta el inicio del sol %d; no llegan suministros." % preview.radio_due_sol
+		if preview.radio_due_sol > int(session.rules.config.mission_sols):
+			text += " No llegará antes de terminar la misión."
+	if preview.oxygen_consumed > int(session.rules.config.oxygen_per_sol):
+		text += "\nIncluye oxígeno extra del equipo: consumo total %d este sol." % preview.oxygen_consumed
 	if preview.uses_advice:
 		text += "\nIncluye el consejo recibido; se usa una sola vez."
 	if preview.safety_stop:

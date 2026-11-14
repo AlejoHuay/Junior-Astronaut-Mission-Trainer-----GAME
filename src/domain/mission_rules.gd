@@ -121,12 +121,20 @@ func resolve(state: MissionState, action_id: String, expected_sol: int) -> Dicti
 		state.panel_fault = false
 	if config.actions[action_id].get("reinforce", false):
 		state.reinforced = true
+	if action_id == "eva" and not state.safety_stop:
+		state.samples += 1
 	if state.safety_stop:
-		state.outcome = "Misión detenida por seguridad: durante una alerta solar necesitas refugio o protección interior instalada antes del sol. No es una predicción médica."
-	elif state.oxygen == 0 or state.food == 0:
-		state.outcome = "La base necesita una pausa: se agotaron las reservas. Prueba otro plan."
+		state.outcome_code = "safety"
+	elif state.oxygen == 0 and state.food == 0:
+		state.outcome_code = "oxygen_food"
+	elif state.oxygen == 0:
+		state.outcome_code = "oxygen"
+	elif state.food == 0:
+		state.outcome_code = "food"
 	elif state.sol == int(config.mission_sols):
-		state.outcome = "¡Completaste los 7 soles! Tu equipo mantuvo la base en marcha."
+		state.outcome_code = "success"
+	if not state.outcome_code.is_empty():
+		state.outcome = config.outcomes[state.outcome_code]
 	state.phase = MissionState.Phase.FINISHED if not state.outcome.is_empty() else MissionState.Phase.DECISION
 	var report := {"ok": true, "sol": state.sol, "action": action_id,
 		"event": state.current_event, "materials_used": check.materials_used,
@@ -138,3 +146,15 @@ func resolve(state: MissionState, action_id: String, expected_sol: int) -> Dicti
 		state.sol += 1
 		_prepare_sol(state)
 	return report
+
+func summary(state: MissionState) -> Dictionary:
+	var harvested: int = 0
+	var interruptions: int = 0
+	var shelter_turns: int = 0
+	for entry in state.history:
+		harvested += int(entry.budget.crop.harvest)
+		interruptions += 1 if entry.budget.crop.interrupted else 0
+		shelter_turns += 1 if entry.budget.sheltered else 0
+	return {"success": state.outcome_code == "success", "science_goal": state.science >= int(config.science_goal),
+		"sample_goal": state.samples > 0, "harvested": harvested, "interruptions": interruptions,
+		"shelter_turns": shelter_turns, "pending_count": state.pending.size()}
