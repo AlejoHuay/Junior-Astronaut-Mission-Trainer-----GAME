@@ -83,9 +83,13 @@ func _show_mission() -> void:
 	_label(content, "SOL %d / 7   ·   BASE AURORA" % state.sol, 34)
 	_label(content, "ENERGÍA  %d / %d     |     OXÍGENO  %d     |     ALIMENTOS  %d" % [state.energy, session.rules.config.battery_capacity, state.oxygen, state.food], 26, ACCENT)
 	_label(content, "Hallazgos: %d  ·  Unidades de juego, no medidas reales" % state.science, 17, MUTED)
+	var event: Dictionary = session.rules.config.events[state.current_event]
+	_label(content, "ENTORNO · %s — %s\n%s" % [event.label, event.description, "Aviso: alerta solar prevista para el próximo sol. Prepara protección." if state.next_solar_alert else "Eventos ficticios de entrenamiento, no observaciones NASA."], 18, ACCENT)
+	var radio_text := state.radio_message if not state.radio_message.is_empty() else "Sin consulta enviada. Una respuesta tarda %d soles simulados." % session.rules.config.communication_delay
+	_label(content, "RADIO · " + radio_text, 18, MUTED)
 	_label(content, "PROTECCIÓN · %s · Materiales disponibles: %d\n%s" % ["Interior reforzado" if state.reinforced else "Refugio disponible; interior sin refuerzo", state.materials, "ALERTA SOLAR: refugio o trabajo interior con refuerzo previo. Salir detiene la misión." if state.solar_alert else "Sin alerta solar este sol. El refugio ocupa tu turno de trabajo."], 18, MUTED)
 	_label(content, "INVERNADERO · %d / %d soles de cuidado. Cosecha: +%d alimentos.\nTiempo comprimido para jugar: las plantas reales no crecen en dos días. Una tarea distinta pierde el progreso del ciclo." % [state.crop_progress, session.rules.config.crop_turns, session.rules.config.harvest_food], 18, MUTED)
-	status = _label(content, "Elige un plan de energía para este sol. Después del trabajo: oxígeno −%d, alimentos −%d y producción solar +%d (hasta llenar la batería)." % [session.rules.config.oxygen_per_sol, session.rules.config.food_per_sol, session.rules.config.solar_per_sol], 20)
+	status = _label(content, "Elige un plan para este sol. Consumo base: oxígeno −%d, alimentos −%d. Solar disponible: %d.\nLa vista previa incluye lo conocido de este sol; los eventos futuros inciertos no están incluidos." % [session.rules.config.oxygen_per_sol, session.rules.config.food_per_sol, maxi(0, state.solar_output - (int(session.rules.config.panel_fault_loss) if state.panel_fault else 0))], 20)
 	if state.phase == MissionState.Phase.FINISHED:
 		_label(content, state.outcome, 28)
 		_button(content, "Volver a planear", _show_menu).grab_focus()
@@ -120,19 +124,27 @@ func _history() -> String:
 		return "Aquí verás las consecuencias de tus decisiones. Tú eliges el plan."
 	var lines := PackedStringArray()
 	for entry in session.state.history:
-		lines.append("Sol %d · %s: energía %+d, oxígeno %+d, comida %+d, hallazgos %+d" % [entry.sol, session.rules.config.actions[entry.action].label, entry.energy, entry.oxygen, entry.food, entry.science])
+		lines.append("Sol %d · %s · %s: energía %+d, oxígeno %+d, comida %+d, hallazgos %+d" % [entry.sol, session.rules.config.events[entry.event].label, session.rules.config.actions[entry.action].label, entry.energy, entry.oxygen, entry.food, entry.science])
 		var budget: Dictionary = entry.budget
 		lines.append("  Energía: −%d trabajo +%d solar almacenada (%d sin espacio). Oxígeno: +%d producido −%d consumo." % [budget.cost, budget.solar_stored, budget.solar_spilled, budget.oxygen_produced, budget.oxygen_consumed])
 		lines.append("  Alimentos: +%d cosecha −%d consumo. %s" % [budget.crop.harvest, budget.food_consumed, _crop_text(budget.crop)])
+		if budget.radio_due_sol > 0:
+			lines.append("  Consulta enviada: respuesta al inicio del sol %d (consejo, no suministros)." % budget.radio_due_sol)
+		if budget.uses_advice:
+			lines.append("  Consejo aplicado: mejoró esta producción local de oxígeno.")
 	return "\n".join(lines)
 
 func _preview_text(preview: Dictionary) -> String:
 	if not preview.ok:
 		return "No disponible: " + str(preview.reason)
-	var text := "Asignación: aire %d + ciencia %d + cultivo %d = %d de energía.\nProduce %d de oxígeno y %d hallazgos.\nAl cerrar el sol: energía %d · oxígeno %d · comida %d." % [preview.allocation.life_support, preview.allocation.science, preview.allocation.greenhouse, preview.cost, preview.oxygen_produced, preview.science_gained, preview.energy_after, preview.oxygen_after, preview.food_after]
+	var text := "Energía: aire %d + ciencia %d + cultivo %d + trabajo/radio %d = %d.\nProduce %d de oxígeno y %d hallazgos.\nAl cerrar el sol: energía %d · oxígeno %d · comida %d." % [preview.allocation.life_support, preview.allocation.science, preview.allocation.greenhouse, preview.work_energy, preview.cost, preview.oxygen_produced, preview.science_gained, preview.energy_after, preview.oxygen_after, preview.food_after]
 	text += "\n" + _crop_text(preview.crop)
 	if preview.materials_used > 0:
-		text += "\nMateriales: −%d. La mejora protege desde el próximo sol." % preview.materials_used
+		text += "\nMateriales locales: −%d." % preview.materials_used
+	if preview.radio_due_sol > 0:
+		text += "\nConsejo pendiente hasta el inicio del sol %d; no llegan suministros." % preview.radio_due_sol
+	if preview.uses_advice:
+		text += "\nIncluye el consejo recibido; se usa una sola vez."
 	if preview.safety_stop:
 		text += "\n¡ALERTA! Sin protección suficiente: este plan detiene la misión por seguridad."
 	if preview.solar_spilled > 0:

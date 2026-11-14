@@ -10,8 +10,8 @@ var state: MissionState
 func _init(settings: Dictionary) -> void:
 	rules = MissionRules.new(settings)
 
-func start(seed_value: int = 214) -> void:
-	state = rules.start(seed_value)
+func start(seed_value: int = 214, scenario_id: String = "demo") -> void:
+	state = rules.start(seed_value, scenario_id)
 	changed.emit()
 
 func choose(action_id: String, expected_sol: int) -> void:

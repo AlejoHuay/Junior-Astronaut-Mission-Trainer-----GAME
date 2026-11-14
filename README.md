@@ -5,11 +5,13 @@ Energía, oxígeno y alimentos hacen visibles las renuncias de una misión. Dura
 
 ## Estado actual
 
-**Fase 1 completada; Fase 2 en curso.** Última iteración: **F2-03**, protección y actividad exterior.
+**Fase 1 completada; Fase 2 en curso.** Última iteración: **F2-04**, eventos y comunicaciones.
 El usuario confirmó en navegador la cosecha **5 → 4 → 7** de F2-02.
-Próxima implementación: **F2-04: eventos y comunicaciones**. Refugio, refuerzo limitado por materiales
-y salidas con consumo extra de oxígeno implementados. Pruebas de protección, suite y escenas pasan;
-exportación web sin hilos correcta. Las alertas se inyectaron en pruebas; su calendario llega en F2-04.
+Próxima implementación: **F2-05: objetivos, finales y balance integral**. Polvo, avería persistente,
+reparación local y alertas anunciadas están conectados al juego. La radio tarda dos soles en entregar
+consejo de uso único, sin suministros instantáneos. **284 aserciones**, escenas y exportación sin hilos pasan.
+El juego inicia ahora en Misión Aurora: polvo sol 3, alerta sol 4 y avería sol 6. El protocolo anterior
+sin refugio corresponde al entrenamiento tranquilo; se actualizará con el selector de escenarios F2-05.
 Cinco planes de asignación. Cuidar el cultivo cuesta 3 de energía por sol; dos cuidados consecutivos
 entregan 4 alimentos antes del consumo del segundo sol. Otra tarea pierde el progreso sin reembolso.
 Reservas iniciales: energía 8, oxígeno 7 y alimentos 5. Al menos una cosecha es necesaria para siete soles.
@@ -137,3 +139,4 @@ agrícolas observados ni implican que cualquier interrupción real destruya plan
 | F2-01 | Asignaciones aire/ciencia, plan combinado y reserva, presupuesto previo, excedente solar y bitácora desglosada | 112 aserciones; importación/exportación sin hilos; tres decisiones verificadas en Edge con escasez y recuperación | F2-02: alimentos e invernadero |
 | F2-02 | Cultivo con costo, cosecha diferida, interrupción, reservas iniciales 5 y compresión temporal documentada | 154 aserciones y prueba de escenas pasan; importación/exportación sin hilos; revisión visual bloqueada por geometría de Computer Use | Revisar cultivo en navegador; F2-03: protección y actividad exterior |
 | F2-03 | Refugio, refuerzo con 2 materiales y trabajo, salidas con oxígeno extra y parada de seguridad | Suite, escenas y exportación sin hilos pasan; cultivo 5 → 4 → 7 validado por usuario | F2-04: eventos y comunicaciones |
+| F2-04 | Catálogo validado de eventos, polvo, avería/reparación, aviso solar y radio con consejo diferido | 284 aserciones; escenas; exportación sin hilos; determinismo y entrega única comprobados | F2-05: objetivos, finales y balance |

@@ -55,4 +55,20 @@ Reforzar gasta dos materiales y un turno; la protección interior se evalúa ant
 por lo que debe prepararse antes de una alerta. Nunca protege una salida exterior.
 Explorar gasta un oxígeno extra del traje y dos de energía para tres hallazgos. Una decisión sin
 protección durante alerta detiene la misión por protocolo educativo, sin dosis ni consecuencias clínicas.
-F2-03 prueba alertas inyectadas; F2-04 las conectará con eventos de la misión.
+F2-04 conecta las alertas con los eventos de misión.
+
+## Eventos y radio (F2-04)
+
+Infraestructura lee y valida `data/events/scenarios.json`, luego inyecta catálogo y escenarios al dominio.
+Al iniciar cada sol, primero se selecciona su evento (solo entonces se consume RNG si hay alternativas),
+se actualizan alerta/producción/avería y se entregan efectos cuyo `due_sol` llegó. La vista previa no tira
+dados. Antes de cada selección se restaura el estado RNG propio de la misión; después se conserva.
+Los escenarios no permiten alertas solares aleatorias sin aviso: una alerta fija se anuncia el sol anterior.
+Polvo afecta solo producción del sol; avería persiste y resta dos hasta reparación. Reparar cobra trabajo,
+energía y material local y restaura producción antes de recargar, sin eliminar el polvo presente.
+
+La radio cobra energía y turno, agenda consejo al inicio del sol actual + 2 y rechaza consultas duplicadas.
+El consejo no modifica reservas al llegar: mejora en dos una futura producción local de oxígeno y se consume.
+Los pendientes permanecen registrados si vencen después del final; nunca se adelantan para premiar al jugador.
+Estos tiempos, rendimientos y eventos son balance ficticio, no latencias reales ni datos NASA.
+`pending`, `radio_sent`, `advice_ready`, avería, evento actual, escenario y RNG pertenecen al snapshot.

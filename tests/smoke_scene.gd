@@ -9,7 +9,7 @@ func exercise_scene() -> void:
 	var screen = packed.instantiate()
 	root.add_child(screen)
 	await process_frame
-	screen.session.start(214)
+	screen.session.start(214, "training")
 	for action in ["grow", "grow", "support", "grow", "support", "research", "support"]:
 		screen.session.choose(action, screen.session.state.sol)
 		await process_frame

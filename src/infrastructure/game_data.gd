@@ -12,10 +12,20 @@ func load_balance(path: String = "res://data/balance/mission.json") -> Dictionar
 	if not parsed is Dictionary or not validate_balance(parsed):
 		error = "El archivo de balance no es válido."
 		return {}
+	var catalog_file := FileAccess.open("res://data/events/scenarios.json", FileAccess.READ)
+	if catalog_file == null:
+		error = "No se pudo abrir el catálogo de escenarios."
+		return {}
+	var catalog = JSON.parse_string(catalog_file.get_as_text())
+	if not catalog is Dictionary or not validate_events(catalog, int(parsed.mission_sols)):
+		error = "El catálogo de eventos no es válido."
+		return {}
+	parsed["events"] = catalog.events
+	parsed["scenarios"] = catalog.scenarios
 	return parsed
 
 func validate_balance(value: Dictionary) -> bool:
-	for key in ["mission_sols", "battery_capacity", "solar_per_sol", "oxygen_per_sol", "food_per_sol", "crop_turns", "harvest_food"]:
+	for key in ["mission_sols", "battery_capacity", "solar_per_sol", "oxygen_per_sol", "food_per_sol", "crop_turns", "harvest_food", "communication_delay", "advice_oxygen_bonus", "panel_fault_loss"]:
 		if not _positive_integer(value.get(key)):
 			return false
 	if not value.get("initial") is Dictionary or not value.get("actions") is Dictionary:
@@ -25,7 +35,7 @@ func validate_balance(value: Dictionary) -> bool:
 			return false
 	if value.crop_turns < 2 or value.crop_turns > value.mission_sols:
 		return false
-	for key in ["support", "research", "grow", "shelter", "reinforce", "eva"]:
+	for key in ["support", "research", "grow", "shelter", "reinforce", "eva", "radio", "repair"]:
 		if not value.actions.get(key) is Dictionary:
 			return false
 	for action in value.actions.values():
@@ -39,7 +49,8 @@ func validate_balance(value: Dictionary) -> bool:
 			if not _number(amount) or amount < 0 or amount > value.battery_capacity:
 				return false
 			cost += int(amount)
-		if cost > value.battery_capacity:
+		var work = action.get("work_energy", 0)
+		if not _number(work) or work < 0 or cost + work > value.battery_capacity:
 			return false
 		if not action.get("label") is String or not action.get("description") is String:
 			return false
@@ -64,6 +75,35 @@ func validate_balance(value: Dictionary) -> bool:
 	if value.actions.grow.allocation.greenhouse <= 0:
 		return false
 	return value.initial.energy <= value.battery_capacity
+
+func validate_events(catalog: Dictionary, sols: int) -> bool:
+	if not catalog.get("events") is Dictionary or not catalog.get("scenarios") is Dictionary:
+		return false
+	for event_id in ["clear", "dust", "solar", "failure"]:
+		var event = catalog.events.get(event_id)
+		if not event is Dictionary or not event.get("label") is String or not event.get("description") is String:
+			return false
+		if not _number(event.get("solar")) or event.solar < 0 or event.solar > 1000:
+			return false
+	for scenario_id in ["training", "demo", "exploration"]:
+		if not catalog.scenarios.has(scenario_id):
+			return false
+	for scenario in catalog.scenarios.values():
+		if not scenario is Dictionary or not scenario.get("label") is String or not scenario.get("description") is String:
+			return false
+		if not scenario.get("timeline") is Array or scenario.timeline.size() != sols:
+			return false
+		for entry in scenario.timeline:
+			if entry is String:
+				if not catalog.events.has(entry):
+					return false
+			elif entry is Array and not entry.is_empty():
+				for choice in entry:
+					if not choice is String or choice not in ["clear", "dust", "failure"]:
+						return false
+			else:
+				return false
+	return true
 
 func _number(value: Variant) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and float(value) == floor(float(value))
