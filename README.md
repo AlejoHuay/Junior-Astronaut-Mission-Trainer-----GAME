@@ -5,8 +5,8 @@ Energía, oxígeno y alimentos hacen visibles las renuncias de una misión. Dura
 
 ## Estado actual
 
-Fase 1 en curso. Última iteración: **F1-02**. Próxima: **F1-03: nucleo de simulacion**.
-Estado de esta iteración: Proyecto Compatibility, tareas VS Code y exportacion web sin hilos. Verificación: Importacion y exportacion release correctas con Godot 4.7.2.
+Fase 1 en curso. Última iteración: **F1-03**. Próxima: **F1-04: recorrido jugable**.
+Estado de esta iteración: Dominio tipado, acciones atomicas y balance validado. Verificación: 14 aserciones headless pasan; determinismo, siete soles y rechazo sin cambios.
 Rama `feat/mission-trainer`; main, origin y commit inicial conservados. Sin push ni merge.
 
 ## Entorno y ejecución
@@ -57,3 +57,4 @@ abstracciones educativas, nunca dosis clínicas ni observaciones de una base mar
 |---|---|---|---|
 | F1-01 | Rama, README, AGENTS, PLAN y CHALLENGE | Git y versión de Godot comprobados; documentos revisados | F1-02: entorno y exportación |
 | F1-02 | Proyecto Compatibility, tareas VS Code y exportacion web sin hilos | Importacion y exportacion release correctas con Godot 4.7.2 | F1-03: nucleo de simulacion |
+| F1-03 | Dominio tipado, acciones atomicas y balance validado | 14 aserciones headless pasan; determinismo, siete soles y rechazo sin cambios | F1-04: recorrido jugable |

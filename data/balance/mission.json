@@ -1,0 +1,12 @@
+{
+    "mission_sols": 7,
+    "battery_capacity": 12,
+    "solar_per_sol": 4,
+    "oxygen_per_sol": 2,
+    "food_per_sol": 1,
+    "initial": {"energy": 8, "oxygen": 7, "food": 10},
+    "actions": {
+        "support": {"label": "Renovar oxígeno", "energy": 4, "oxygen": 5, "description": "Usa 4 de energía y produce 5 de oxígeno. Hoy renuncias a investigar."},
+        "research": {"label": "Investigar Marte", "energy": 3, "science": 2, "description": "Usa 3 de energía para conseguir 2 hallazgos. Hoy no produces oxígeno."}
+    }
+}
