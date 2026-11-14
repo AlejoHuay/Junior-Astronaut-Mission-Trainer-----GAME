@@ -27,13 +27,32 @@ func validate_balance(value: Dictionary) -> bool:
 		if not value.actions.get(key) is Dictionary:
 			return false
 	for action in value.actions.values():
-		if not action is Dictionary or not _positive_integer(action.get("energy")):
+		if not action is Dictionary or not action.get("allocation") is Dictionary:
+			return false
+		if action.allocation.size() != 2:
+			return false
+		var cost: int = 0
+		for system in ["life_support", "science"]:
+			var amount = action.allocation.get(system)
+			if not _number(amount) or amount < 0 or amount > value.battery_capacity:
+				return false
+			cost += int(amount)
+		if cost > value.battery_capacity:
 			return false
 		if not action.get("label") is String or not action.get("description") is String:
 			return false
 		for key in ["oxygen", "science"]:
-			if action.has(key) and (not _number(action[key]) or action[key] < 0):
+			if action.has(key) and (not _number(action[key]) or action[key] < 0 or action[key] > 1000):
 				return false
+		if action.get("oxygen", 0) > 0 and action.allocation.life_support == 0:
+			return false
+		if action.get("science", 0) > 0 and action.allocation.science == 0:
+			return false
+	if not value.actions.has("reserve"):
+		return false
+	var reserve: Dictionary = value.actions.reserve
+	if reserve.allocation.life_support != 0 or reserve.allocation.science != 0 or reserve.get("oxygen", 0) != 0 or reserve.get("science", 0) != 0:
+		return false
 	return value.initial.energy <= value.battery_capacity
 
 func _number(value: Variant) -> bool:

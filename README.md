@@ -5,12 +5,14 @@ Energía, oxígeno y alimentos hacen visibles las renuncias de una misión. Dura
 
 ## Estado actual
 
-**Fase 1 completada.** Última iteración: **F1-04c**, aceptación manual del recorrido. Próxima: **F2-01: energía y soporte vital**.
-Exportación regenerada con plantilla `web_nothreads_release.zip`. Importación, 14 aserciones,
-inicio de escena headless y comprobación de memoria WebAssembly pasan. **Arranque visual confirmado en Edge**:
-tras recargar se muestra el menú «Tu primera base. Un gran reto en Marte.», semilla 214 y botón Comenzar misión.
-El usuario confirmó en Edge ambos finales (éxito y agotamiento de oxígeno) y reportó que todo
-el recorrido de comprobación salió bien. Esta evidencia manual complementa las pruebas automatizadas.
+**Fase 1 completada; Fase 2 en curso.** Última iteración: **F2-01**, energía y soporte vital.
+Próxima: **F2-02: alimentos e invernadero con cosecha diferida**.
+Cuatro planes de asignación, vista previa de recursos al cierre del sol, batería limitada y rechazo
+explicado de planes imposibles. Importación, **112 aserciones**, exportación y control del WASM sin hilos pasan.
+Verificación visual en Edge: dos planes combinados reducen energía 8 → 6 → 4; el siguiente se bloquea
+con «Faltan 2»; reservar recupera energía a 8 y consume oxígeno 9 → 7. Las vistas previas coinciden.
+La validación anterior de ambos finales por el usuario corresponde a Fase 1; no se presenta como prueba
+manual de una partida completa de esta nueva versión.
 Rama `feat/mission-trainer`; main, origin y commit inicial conservados. Sin push ni merge.
 
 ## Entorno y ejecución
@@ -26,6 +28,7 @@ Comandos comprobados desde la raíz:
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 import
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 export
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 verify
 ```
 
 También disponibles como tareas de VS Code. La política Bypass se aplica solo a ese proceso.
@@ -39,8 +42,10 @@ con `python scripts/check_web_export.py build/web`; falla si requiere memoria co
 
 Dominio independiente → aplicación → adaptadores de archivos y presentación Godot.
 Completado: inspección, rama, documentación, proyecto Compatibility, núcleo determinista, inicio,
-misión con dos acciones, resultado, reinicio y exportación web, con ambos finales validados por el usuario
-en navegador. Pendiente: sistemas Fase 2, ciencia archivada, presentación Fase 3 y guardado Fase 4.
+misión, resultado, reinicio y exportación web; energía y soporte vital de F2-01. Cuatro planes definidos
+en JSON asignan energía a aire y ciencia; la bitácora desglosa gasto, recarga, excedente solar y oxígeno.
+Reservar cuesta un sol y reservas aunque no gasta energía. El plan combinado agota la batería si se repite.
+Pendiente: F2-02 a F2-05, ciencia archivada, presentación Fase 3 y guardado Fase 4.
 [Plan completo](docs/PLAN.md) · [Desafío](docs/CHALLENGE.md) · [Arquitectura](docs/ARCHITECTURE.md).
 
 ## Verificación y problemas conocidos
@@ -50,7 +55,12 @@ Godot 4.7.2 ejecutable. Ejecutadas 14 aserciones headless: todas pasan, incluyen
 determinismo, rechazo atómico y órdenes duplicadas. Importación y exportación release posteriores
 a la interfaz también pasan. El usuario completó ambos finales en Edge y confirmó el resultado satisfactorio
 del protocolo manual. No se atribuye esta prueba manual al agente ni se afirma una prueba de usabilidad
-con niños o una duración de partida medida. No se repitieron pruebas de código para este cierre documental.
+con niños o una duración de partida medida. En F2-01 se amplió y ejecutó la suite a 112 aserciones:
+límites 0–12 de batería, excedente solar, recuperación, producción antes de consumo, escasez,
+asignaciones inválidas, vista previa sin mutaciones y coincidencia con resolución. Todas pasan.
+La revisión visual F2-01 cubre inicio y tres decisiones en Edge; no se ha validado diseño móvil,
+lectores de pantalla, diversión ni balance final. En ventanas pequeñas, bitácora y navegación requieren
+desplazamiento vertical; la presentación definitiva sigue prevista en F3-03.
 Una búsqueda inicial no encontró Godot en PATH; el usuario proporcionó después la instalación correcta.
 Un intento anterior de descarga falló y no instaló otro motor. Se obtuvo la plantilla web mediante
 rangos HTTP del paquete oficial; descarga completa detenida. Importación y exportación release pasan.
@@ -65,7 +75,8 @@ con hilos, aunque el preset desactivaba hilos. Corregido en F1-04a usando las va
 La comprobación nueva rechazó el binario anterior y aceptó el regenerado; HTTP 200 sirve exactamente
 el WASM corregido. No se cambiaron cabeceras ni protecciones del navegador.
 Referencia técnica: [exportador oficial Godot 4.7.2](https://raw.githubusercontent.com/godotengine/godot/4.7.2-stable/platform/web/export/export_plugin.cpp).
-**Fase 1 aceptada con la confirmación manual del usuario.** Fases 2–4 aún no implementadas.
+**Fase 1 aceptada con la confirmación manual del usuario. F2-01 implementada y verificada.**
+Fase 2 sigue abierta: aún faltan cultivos, protección, eventos, comunicaciones y balance integral.
 
 ### Protocolo manual para futuras regresiones
 
@@ -77,6 +88,10 @@ Referencia técnica: [exportador oficial Godot 4.7.2](https://raw.githubusercont
    durante siete soles, comenzando y terminando con oxígeno. Comprueba resultado, reinicio y fuentes.
 5. Reinicia y elige investigar cuatro veces para comprobar el final por agotamiento de oxígeno.
 6. Revisa fuentes, regreso al juego, Tab/Enter, textos y controles. Registrar cualquier regresión.
+7. Para F2-01, inicia una partida y elige **Repartir entre ambos** dos veces: al sol 3 debes tener
+   energía 4, oxígeno 9 y alimentos 8; el plan combinado queda deshabilitado con déficit 2.
+8. Elige **Reservar energía**: al sol 4 debes tener energía 8, oxígeno 7, alimentos 7 y 4 hallazgos.
+   Compara la vista previa y la bitácora. Estos tres turnos ya fueron comprobados por el agente en Edge.
 
 El paquete actual está en `build/web`, excluido de Git. No se publicó en internet.
 
@@ -99,3 +114,4 @@ abstracciones educativas, nunca dosis clínicas ni observaciones de una base mar
 | F1-04a | Plantillas web sin hilos; instalador corregido y control automático del WASM | Binario anterior rechazado; regenerado aceptado; 14 aserciones, importación, inicio headless y HTTP pasan | Confirmar arranque y recorrido en Edge; después F2-01 |
 | F1-04b | Verificación visual posterior a la corrección | Edge sale de la carga y muestra el menú inicial; observado mediante Computer Use | Recorrido completo de siete soles en navegador; después F2-01 |
 | F1-04c | Cierre documental de Fase 1 | Usuario confirma ambos finales en Edge y protocolo satisfactorio; sin nuevas pruebas de código | F2-01: energía y soporte vital |
+| F2-01 | Asignaciones aire/ciencia, plan combinado y reserva, presupuesto previo, excedente solar y bitácora desglosada | 112 aserciones; importación/exportación sin hilos; tres decisiones verificadas en Edge con escasez y recuperación | F2-02: alimentos e invernadero |

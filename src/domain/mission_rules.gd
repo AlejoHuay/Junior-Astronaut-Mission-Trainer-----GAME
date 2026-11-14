@@ -24,9 +24,20 @@ func preview(state: MissionState, action_id: String) -> Dictionary:
 	if not config.actions.has(action_id):
 		return {"ok": false, "reason": "Acción desconocida."}
 	var action: Dictionary = config.actions[action_id]
-	if state.energy < int(action.energy):
-		return {"ok": false, "reason": "No alcanza la energía para esta acción."}
-	return {"ok": true, "reason": action.description, "cost": int(action.energy)}
+	var cost := int(action.allocation.life_support) + int(action.allocation.science)
+	if state.energy < cost:
+		return {"ok": false, "reason": "Necesitas %d de energía; tienes %d. Faltan %d. La recarga solar llega después del trabajo." % [cost, state.energy, cost - state.energy]}
+	# Only known effects: no RNG draws or state changes while considering a plan.
+	var stored := mini(int(config.solar_per_sol), int(config.battery_capacity) - (state.energy - cost))
+	return {"ok": true, "reason": action.description, "cost": cost,
+		"allocation": action.allocation.duplicate(), "oxygen_produced": int(action.get("oxygen", 0)),
+		"oxygen_consumed": int(config.oxygen_per_sol), "food_consumed": int(config.food_per_sol),
+		"solar_generated": int(config.solar_per_sol), "solar_stored": stored,
+		"solar_spilled": int(config.solar_per_sol) - stored,
+		"science_gained": int(action.get("science", 0)),
+		"energy_after": state.energy - cost + stored,
+		"oxygen_after": maxi(0, state.oxygen + int(action.get("oxygen", 0)) - int(config.oxygen_per_sol)),
+		"food_after": maxi(0, state.food - int(config.food_per_sol))}
 
 func resolve(state: MissionState, action_id: String, expected_sol: int) -> Dictionary:
 	if expected_sol != state.sol:
@@ -36,15 +47,10 @@ func resolve(state: MissionState, action_id: String, expected_sol: int) -> Dicti
 		return check
 	state.phase = MissionState.Phase.RESOLUTION
 	var before := state.snapshot()
-	var action: Dictionary = config.actions[action_id]
-	state.energy -= int(action.energy)
-	state.oxygen += int(action.get("oxygen", 0))
-	state.science += int(action.get("science", 0))
-	state.oxygen -= int(config.oxygen_per_sol)
-	state.food -= int(config.food_per_sol)
-	state.energy = mini(int(config.battery_capacity), state.energy + int(config.solar_per_sol))
-	state.oxygen = maxi(0, state.oxygen)
-	state.food = maxi(0, state.food)
+	state.energy = int(check.energy_after)
+	state.oxygen = int(check.oxygen_after)
+	state.food = int(check.food_after)
+	state.science += int(check.science_gained)
 	if state.oxygen == 0 or state.food == 0:
 		state.outcome = "La base necesita una pausa: se agotaron las reservas. Prueba otro plan."
 	elif state.sol == int(config.mission_sols):
@@ -52,7 +58,8 @@ func resolve(state: MissionState, action_id: String, expected_sol: int) -> Dicti
 	state.phase = MissionState.Phase.FINISHED if not state.outcome.is_empty() else MissionState.Phase.DECISION
 	var report := {"ok": true, "sol": state.sol, "action": action_id,
 		"energy": state.energy - int(before.energy), "oxygen": state.oxygen - int(before.oxygen),
-		"food": state.food - int(before.food), "science": state.science - int(before.science)}
+		"food": state.food - int(before.food), "science": state.science - int(before.science),
+		"budget": check.duplicate(true)}
 	state.history.append(report)
 	if state.phase != MissionState.Phase.FINISHED:
 		state.sol += 1

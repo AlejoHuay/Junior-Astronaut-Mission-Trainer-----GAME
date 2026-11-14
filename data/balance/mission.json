@@ -6,7 +6,9 @@
     "food_per_sol": 1,
     "initial": {"energy": 8, "oxygen": 7, "food": 10},
     "actions": {
-        "support": {"label": "Renovar oxígeno", "energy": 4, "oxygen": 5, "description": "Usa 4 de energía y produce 5 de oxígeno. Hoy renuncias a investigar."},
-        "research": {"label": "Investigar Marte", "energy": 3, "science": 2, "description": "Usa 3 de energía para conseguir 2 hallazgos. Hoy no produces oxígeno."}
+        "support": {"label": "Renovar oxígeno", "allocation": {"life_support": 4, "science": 0}, "oxygen": 5, "description": "Prioriza el aire de la base. Hoy renuncias a investigar."},
+        "research": {"label": "Investigar Marte", "allocation": {"life_support": 0, "science": 3}, "science": 2, "description": "Prioriza los hallazgos. Hoy no produces oxígeno."},
+        "combined": {"label": "Repartir entre ambos", "allocation": {"life_support": 3, "science": 3}, "oxygen": 3, "science": 2, "description": "Produce aire e investiga, pero gasta más energía de la que recargan los paneles."},
+        "reserve": {"label": "Reservar energía", "allocation": {"life_support": 0, "science": 0}, "description": "No activas sistemas de trabajo. Recargas la batería, pero consumes reservas y pierdes un sol de investigación."}
     }
 }

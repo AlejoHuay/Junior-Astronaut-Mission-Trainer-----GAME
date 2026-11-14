@@ -83,7 +83,7 @@ func _show_mission() -> void:
 	_label(content, "SOL %d / 7   ·   BASE AURORA" % state.sol, 34)
 	_label(content, "ENERGÍA  %d / %d     |     OXÍGENO  %d     |     ALIMENTOS  %d" % [state.energy, session.rules.config.battery_capacity, state.oxygen, state.food], 26, ACCENT)
 	_label(content, "Hallazgos: %d  ·  Unidades de juego, no medidas reales" % state.science, 17, MUTED)
-	status = _label(content, "Al terminar el sol: oxígeno −2, alimentos −1; los paneles recargan la batería.", 20)
+	status = _label(content, "Elige un plan de energía para este sol. Después del trabajo: oxígeno −%d, alimentos −%d y producción solar +%d (hasta llenar la batería)." % [session.rules.config.oxygen_per_sol, session.rules.config.food_per_sol, session.rules.config.solar_per_sol], 20)
 	if state.phase == MissionState.Phase.FINISHED:
 		_label(content, state.outcome, 28)
 		_button(content, "Volver a planear", _show_menu).grab_focus()
@@ -101,8 +101,9 @@ func _show_mission() -> void:
 			actions.add_child(card)
 			var button := _button(card, action.label, session.choose.bind(action_id, state.sol))
 			button.disabled = not check.ok
-			_label(card, action.description if check.ok else check.reason, 18, MUTED)
-			if action_id == "support":
+			_label(card, action.description, 18, MUTED)
+			_label(card, _preview_text(check), 18, ACCENT if check.ok else Color("ffca88"))
+			if check.ok and not get_viewport().gui_get_focus_owner():
 				button.grab_focus()
 	_label(content, "BITÁCORA · Qué cambió y por qué", 20, ACCENT)
 	log_text = _label(content, _history(), 18, MUTED)
@@ -118,7 +119,19 @@ func _history() -> String:
 	var lines := PackedStringArray()
 	for entry in session.state.history:
 		lines.append("Sol %d · %s: energía %+d, oxígeno %+d, comida %+d, hallazgos %+d" % [entry.sol, session.rules.config.actions[entry.action].label, entry.energy, entry.oxygen, entry.food, entry.science])
+		var budget: Dictionary = entry.budget
+		lines.append("  Energía: −%d trabajo +%d solar almacenada (%d sin espacio). Oxígeno: +%d producido −%d consumo." % [budget.cost, budget.solar_stored, budget.solar_spilled, budget.oxygen_produced, budget.oxygen_consumed])
 	return "\n".join(lines)
+
+func _preview_text(preview: Dictionary) -> String:
+	if not preview.ok:
+		return "No disponible: " + str(preview.reason)
+	var text := "Asignación: aire %d + ciencia %d = %d de energía.\nProduce %d de oxígeno y %d hallazgos.\nAl cerrar el sol: energía %d · oxígeno %d · comida %d." % [preview.allocation.life_support, preview.allocation.science, preview.cost, preview.oxygen_produced, preview.science_gained, preview.energy_after, preview.oxygen_after, preview.food_after]
+	if preview.solar_spilled > 0:
+		text += "\nBatería llena: %d de energía solar no se almacenan." % preview.solar_spilled
+	if preview.oxygen_after == 0 or preview.food_after == 0:
+		text += "\n¡Atención! Este plan agota una reserva y termina la misión."
+	return text
 
 func _show_sources() -> void:
 	_page()
