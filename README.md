@@ -7,7 +7,7 @@ pendiente de medir con jugadores. Interfaz en español, sin cuentas ni APIs dura
 ## Estado actual
 
 **F4-01 implementada: guardado automático y continuación. Aceptación web pendiente.**
-Siguiente tarea: F4-02 a F4-04, revisión automatizada final, paquete ZIP y pitch.
+F4-02: protocolo de revisión integral preparado. Siguiente: F4-03, paquete ZIP; F4-04, pitch.
 El usuario comprobará persistencia en Edge; sus compañeros harán la revisión final con el ZIP.
 Fases 3 y 4 no se declaran aceptadas hasta registrar esos resultados manuales.
 El usuario confirmó la revisión solicitada de Fase 2 el 15-11-2026. Es validación manual del
@@ -108,6 +108,8 @@ ayuda y controles de preferencias observados. No constituye aceptación completa
 La comprobación de recarga de F4-01 se detuvo por Escape; persistencia web aún no comprobada.
 Se sustituyeron flechas que aparecían como cuadrados; falta confirmación visual de la corrección.
 [Pasos de aceptación de Fase 3](docs/PHASE3_REVIEW.md).
+[Protocolo final y plantilla de resultados](docs/TESTING.md): M01–M12 pendientes;
+persistencia en Edge a cargo del usuario y revisión del ZIP a cargo de sus compañeros.
 
 Prueba rápida de Aurora/214: **cultivo, cultivo, oxígeno, refugio, ambos, exterior, oxígeno**.
 Final esperado: energía 8, oxígeno 4, alimentos 2, ciencia 5 y una muestra exterior.
@@ -151,3 +153,4 @@ Cultivo acelerado, oxígeno de traslado y dos soles de radio son abstracciones e
 | F3-03 | Base 2D original, módulos con estados escritos, animación breve, foco, sonido opcional y reducción de movimiento | 684 aserciones, escena y exportación sin hilos pasan; revisión visual pendiente | F3-04 |
 | F3-04 | Guía contextual, glosario, causas de recursos y aprendizaje según historial | 684 aserciones, procedencia, escenas, exportación sin hilos y HTTP 200; revisión visual pendiente | Aceptación visual; F4-01 |
 | F4-01 | Guardado versionado por turno, continuar, validación por replay y avisos de error; texto sin flechas problemáticas | 684 aserciones de dominio, 631 de persistencia, escenas y exportación; revisión Edge pendiente a cargo del usuario | F4-02: revisión integral y protocolo manual |
+| F4-02 | Matriz de aceptación, resultados esperados y plantilla de reporte para el equipo | Evidencia automatizada F4-01 revisada; M01–M12 explícitamente pendientes, sin nuevas partidas web | F4-03: ZIP reproducible |
