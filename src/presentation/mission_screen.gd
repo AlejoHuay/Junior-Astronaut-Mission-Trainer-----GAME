@@ -22,6 +22,8 @@ var seed_input: SpinBox
 var reduced_motion: bool = false
 var sound_enabled: bool = false
 var cue: AudioStreamPlayer
+var learning: Dictionary
+var tutorial_enabled: bool = true
 
 func _ready() -> void:
 	_setup_theme()
@@ -29,7 +31,8 @@ func _ready() -> void:
 	science_catalog = science_provider.load_catalog()
 	var provider := GameData.new()
 	var config := provider.load_balance()
-	if config.is_empty():
+	learning = provider.load_learning()
+	if config.is_empty() or learning.is_empty():
 		_label(self, provider.error, 24)
 		return
 	session = MissionSession.new(config)
@@ -98,6 +101,16 @@ func _page() -> void:
 	_label(content, "JUNIOR ASTRONAUT   /   CONTROL DE MISIÓN", 17, ACCENT)
 
 func _preferences() -> void:
+	var tutorial := CheckButton.new()
+	tutorial.text = "Mostrar consejo del turno"
+	tutorial.button_pressed = tutorial_enabled
+	tutorial.custom_minimum_size.y = 48
+	content.add_child(tutorial)
+	tutorial.toggled.connect(func(value: bool):
+		tutorial_enabled = value
+		var hint := content.get_node_or_null("TurnHint")
+		if hint != null:
+			hint.visible = value)
 	var motion := CheckButton.new()
 	motion.text = "Reducir movimiento"
 	motion.button_pressed = reduced_motion
@@ -143,6 +156,7 @@ func _show_menu() -> void:
 		session.start(int(seed_input.value), str(scenario_picker.get_item_metadata(scenario_picker.selected))))
 	start_button.grab_focus()
 	_button(content, "Fuentes y créditos", _show_sources)
+	_button(content, "Cómo jugar · palabras de la misión", _show_help)
 	_preferences()
 	_label(content, "Simulación educativa • Sin cuentas • Sin conexión durante la partida", 17, MUTED)
 
@@ -159,6 +173,13 @@ func _show_mission() -> void:
 	base.reduced_motion = reduced_motion
 	content.add_child(base)
 	_label(content, "ENERGÍA  %d / %d     |     OXÍGENO  %d     |     ALIMENTOS  %d" % [state.energy, session.rules.config.battery_capacity, state.oxygen, state.food], 26, ACCENT)
+	if state.phase != MissionState.Phase.FINISHED:
+		var hint := _label(content, "GUÍA · " + _turn_hint(), 20)
+		hint.name = "TurnHint"
+		hint.visible = tutorial_enabled
+	if not state.history.is_empty():
+		var budget: Dictionary = state.history.back().budget
+		_label(content, "POR QUÉ CAMBIÓ · Energía: −%d trabajo +%d solar almacenada. Oxígeno: +%d producido −%d consumido. Comida: +%d cosecha −%d consumida." % [budget.cost, budget.solar_stored, budget.oxygen_produced, budget.oxygen_consumed, budget.crop.harvest, budget.food_consumed], 18, MUTED)
 	_label(content, "Opcionales: hallazgos %d / %d · Muestras exteriores %d / 1. Sobrevivir completa la misión." % [state.science, session.rules.config.science_goal, state.samples], 17, MUTED)
 	var science_id: String = session.rules.config.scenarios[state.scenario_id].get("science_id", "")
 	if not science_id.is_empty():
@@ -172,6 +193,7 @@ func _show_mission() -> void:
 	status = _label(content, "Consumo base: oxígeno −%d, comida −%d · Solar disponible: %d. Vista previa solo del sol actual." % [session.rules.config.oxygen_per_sol, session.rules.config.food_per_sol, maxi(0, state.solar_output - (int(session.rules.config.panel_fault_loss) if state.panel_fault else 0))], 18)
 	if state.phase == MissionState.Phase.FINISHED:
 		_label(content, state.outcome, 28)
+		_label(content, "Lo que enseñan tus decisiones\n" + _learning_summary(), 21)
 		var result := session.rules.summary(state)
 		_label(content, "Objetivos opcionales: ciencia %s · muestra exterior %s.\nCosechaste %d alimentos; interrumpiste %d cultivo(s); usaste refugio %d sol(es).\nConsejos aún pendientes al finalizar: %d. No se adelantan ni llegan suministros." % ["lograda" if result.science_goal else "pendiente", "lograda" if result.sample_goal else "pendiente", result.harvested, result.interruptions, result.shelter_turns, result.pending_count], 20, MUTED)
 		_button(content, "Volver a planear", _show_menu).grab_focus()
@@ -210,6 +232,7 @@ func _show_mission() -> void:
 	navigation.add_theme_constant_override("separation", 12)
 	content.add_child(navigation)
 	_button(navigation, "Fuentes", _show_sources)
+	_button(navigation, "Ayuda", _show_help)
 	_button(navigation, "Menú", _show_menu)
 	_preferences()
 
@@ -219,6 +242,43 @@ func _action_selected(index: int) -> void:
 	action_detail.text = session.rules.config.actions[selected_action].description
 	action_preview.text = _preview_text(check)
 	execute_button.disabled = not check.ok
+
+func _turn_hint() -> String:
+	var state := session.state
+	if state.solar_alert:
+		return learning.alert
+	if state.next_solar_alert:
+		return learning.warning
+	if state.crop_progress > 0:
+		return learning.crop
+	if state.sol == 1:
+		return learning.first
+	if not state.pending.is_empty():
+		return learning.radio
+	return learning.later
+
+func _learning_summary() -> String:
+	var result := session.rules.summary(session.state)
+	var lessons := PackedStringArray()
+	if result.harvested > 0:
+		lessons.append(learning.harvest_lesson)
+	if result.interruptions > 0:
+		lessons.append(learning.interruption_lesson)
+	if result.shelter_turns > 0:
+		lessons.append(learning.shelter_lesson)
+	if session.state.radio_sent:
+		lessons.append(learning.radio_lesson)
+	if session.state.science > 0:
+		lessons.append(learning.science_lesson)
+	lessons.append(learning.reflection)
+	return "\n\n".join(lessons)
+
+func _show_help() -> void:
+	_page()
+	_label(content, "Comandar es elegir", 36)
+	_label(content, learning.first + "\n\n" + learning.glossary, 22)
+	_label(content, "Teclado: Tab cambia de control; flechas eligen un plan; Enter o Espacio activa. Seleccionar no gasta nada. Ejecutar avanza un sol.\nLas preferencias se mantienen durante esta sesión. Recargar aún reinicia la misión.", 20, MUTED)
+	_button(content, "Volver a la misión" if session.state != null else "Volver al menú", _show_mission if session.state != null else _show_menu).grab_focus()
 
 func _history() -> String:
 	if session.state.history.is_empty():

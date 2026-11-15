@@ -87,3 +87,15 @@ el turno: muestra costos y restricciones, y el botón de ejecución envía el so
 Los planes imposibles pueden seleccionarse para leer el motivo, pero no ejecutarse. La bitácora es
 desplegable. Datos ambientales, cultivo, radio y protección son estados contextuales; se mantienen
 solo tres reservas principales. Los efectos pendientes no se adelantan al terminar la misión.
+
+## Ciencia y aprendizaje (Fase 3)
+
+`ScienceData` valida el catálogo archivado y ofrece búsquedas por identificador. `demo.science_id`
+vincula Aurora con DONKI; la presentación explica su uso narrativo, sin introducir datos científicos
+en cálculos de riesgo. `check_science.py` contrasta hashes y observaciones contra archivos originales.
+`GameData.load_learning` valida las explicaciones españolas en JSON. Los consejos dependen del
+estado actual; el resumen usa únicamente historial y agregados del dominio. No cambia reglas.
+
+`BaseView` dibuja módulos y estados. Animaciones y audio pertenecen a presentación y no bloquean
+turnos; audio se libera al salir. Preferencias de sesión aún no persistentes. Ayuda/fuentes no
+reinician misión. Recursos originales y créditos en [ASSETS.md](ASSETS.md).

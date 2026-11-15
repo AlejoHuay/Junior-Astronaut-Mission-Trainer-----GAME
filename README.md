@@ -6,7 +6,8 @@ pendiente de medir con jugadores. Interfaz en español, sin cuentas ni APIs dura
 
 ## Estado actual
 
-**Fase 3 en curso: F3-03 implementada; siguiente F3-04 (tutorial y aprendizaje).**
+**Fase 3 implementada hasta F3-04; pendiente su aceptación visual en navegador.**
+Siguiente tarea: revisar base, foco, sonido, tutorial y fuentes; después F4-01 (guardado).
 El usuario confirmó la revisión solicitada de Fase 2 el 15-11-2026. Es validación manual del
 usuario, separada de nuestras pruebas automatizadas. Fases 1 y 2 aceptadas.
 Aurora vincula su alerta ficticia con una llamarada histórica DONKI; fuentes disponibles sin red.
@@ -59,16 +60,22 @@ valida JSON; presentación ofrece controles y explicaciones. Semilla y RNG propi
 - Misión: tres escenarios, objetivos opcionales de ciencia y muestra exterior, finales específicos,
   resumen basado en historial, reinicio y bitácora. La ciencia opcional no es condición de supervivencia.
 
-Pendientes de Fases 3–4: datos NASA archivados, base visual definitiva, audio y accesibilidad ampliada,
-tutorial completo, guardado/carga y entrega final. No hay persistencia todavía; recargar reinicia la partida.
+- Ciencia: DONKI, OSD-267 y RadLab archivados y comprobados; fuentes dentro del juego.
+- Presentación: base 2D original, estados escritos, foco visible, sonido opcional y movimiento reducido.
+- Aprendizaje: consejos contextuales, glosario, causas de cambios y resumen ligado a tus decisiones.
+
+Pendientes: aceptación visual de Fase 3, guardado/carga y entrega final de Fase 4.
+No hay persistencia; recargar reinicia la partida. Preferencias válidas solo durante la sesión.
 
 ## Verificación y balance
 
-**679 aserciones aprobadas**, prueba de escenas y controles aprobada, importación y exportación web
+**684 aserciones aprobadas**, prueba de escenas y controles aprobada, importación y exportación web
 sin hilos correctas. La suite cubre restricciones, recursos, cosechas, interrupciones, seguridad,
 radio diferida/uso único, determinismo, semilla variable, órdenes duplicadas y prioridad de finales.
 La prueba de escena completa la estrategia científica usando selector y botón de ejecución,
-comprueba victoria con 5 hallazgos, abre fuentes y regresa al menú.
+comprueba victoria con 5 hallazgos, preferencias, ayuda, fuentes y resumen coherente con el historial.
+`python scripts/check_science.py` verifica hashes y correspondencia de los tres archivos científicos.
+Última verificación: `build/verify-f304.txt` (archivo local ignorado).
 
 **48 partidas automatizadas completas:** 4 estrategias × 3 escenarios × 4 semillas.
 Resultados de Aurora con semilla 214:
@@ -89,7 +96,10 @@ Estas pruebas no demuestran diversión, equilibrio óptimo ni duración de 5–1
 Confirmados en versiones anteriores: menú en Edge por el agente; ambos finales de Fase 1 y cosecha
 5 → 4 → 7 por el usuario; restricciones energéticas F2-01 por el agente. La revisión visual final
 de Fase 2 fue confirmada por el usuario el 15-11-2026, tras el bloqueo previo de Computer Use.
-La nueva interfaz de Fase 3 requiere su propia revisión visual.
+La nueva interfaz de Fase 3 requiere su propia revisión visual. El intento del 15-11-2026 se
+detuvo por interacción simultánea del usuario en Edge; la pestaña observada mostraba una versión
+anterior. HTTP 200 comprobado en puerto 8060; no equivale a una partida web.
+[Pasos de aceptación de Fase 3](docs/PHASE3_REVIEW.md).
 
 Prueba rápida de Aurora/214: **cultivo, cultivo, oxígeno, refugio, ambos, exterior, oxígeno**.
 Final esperado: energía 8, oxígeno 4, alimentos 2, ciencia 5 y una muestra exterior.
@@ -107,6 +117,7 @@ El entorno restringido requiere acceso a cachés normales de Godot para importar
 [OSDR](https://osdr.nasa.gov/bio/repo/search?q=&data_source=cgene,alsda,esa&data_type=study),
 [RadLab](https://visualization.osdr.nasa.gov/radlab/gui/data-api/).
 DONKI histórico archivado: llamarada X3.9 del 10-05-2024 vinculada con Aurora.
+OSD-267: ficha y protocolos de cultivo de lechuga en la ISS; RadLab: DosTel con ubicación y unidades.
 [Procedencia y límites](docs/SCIENCE.md). Los efectos del escenario siguen siendo ficticios.
 El juego no está avalado por NASA. El balance no representa dosis ni observaciones de Marte.
 Cultivo acelerado, oxígeno de traslado y dos soles de radio son abstracciones educativas, no mediciones.
@@ -128,6 +139,6 @@ Cultivo acelerado, oxígeno de traslado y dos soles de radio son abstracciones e
 | F2-04 | Catálogo validado de eventos, polvo, avería/reparación, aviso solar y radio con consejo diferido | 284 aserciones; escenas; exportación sin hilos; determinismo y entrega única comprobados | F2-05: objetivos, finales y balance |
 | F2-05 | Objetivos opcionales, finales específicos, selector de escenarios/planes y comparación de estrategias | 679 aserciones, 48 partidas y controles/escenas pasan; exportación sin hilos; revisión visual final bloqueada por URL de Edge | Verificación visual pendiente; F3-01: DONKI histórico |
 | F3-01 | Archivo DONKI original/curado, adaptador validado, Aurora trazable y fuentes | 684 aserciones, procedencia, escenas y exportación sin hilos pasan | F3-02 |
-
 | F3-02 | Ficha OSD-267 y muestra RadLab DosTel archivadas con contexto, límites y unidades | Tres archivos comprobados, 684 aserciones, escenas y exportación sin hilos pasan | F3-03 |
 | F3-03 | Base 2D original, módulos con estados escritos, animación breve, foco, sonido opcional y reducción de movimiento | 684 aserciones, escena y exportación sin hilos pasan; revisión visual pendiente | F3-04 |
+| F3-04 | Guía contextual, glosario, causas de recursos y aprendizaje según historial | 684 aserciones, procedencia, escenas, exportación sin hilos y HTTP 200; revisión visual pendiente | Aceptación visual; F4-01 |

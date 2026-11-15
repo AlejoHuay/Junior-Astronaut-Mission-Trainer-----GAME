@@ -31,6 +31,13 @@ func exercise_scene() -> void:
 		return
 	screen._show_sources()
 	await process_frame
+	screen._show_help()
+	await process_frame
+	var recap: String = screen._learning_summary()
+	if not recap.contains(screen.learning.harvest_lesson) or recap.contains(screen.learning.radio_lesson):
+		printerr("FAIL: recap must match actual decisions")
+		quit(1)
+		return
 	screen._show_menu()
 	await process_frame
 	screen.queue_free()

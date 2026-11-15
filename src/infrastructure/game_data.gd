@@ -3,6 +3,20 @@ extends RefCounted
 
 var error: String = ""
 
+func load_learning(path: String = "res://data/balance/learning.json") -> Dictionary:
+	if not FileAccess.file_exists(path):
+		error = "No se encontraron las explicaciones."
+		return {}
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not parsed is Dictionary:
+		error = "Explicaciones inválidas."
+		return {}
+	for key in ["first", "crop", "alert", "warning", "radio", "later", "glossary", "harvest_lesson", "interruption_lesson", "shelter_lesson", "radio_lesson", "science_lesson", "reflection"]:
+		if not parsed.get(key) is String or parsed[key].is_empty():
+			error = "Falta explicación: " + key
+			return {}
+	return parsed
+
 func load_balance(path: String = "res://data/balance/mission.json") -> Dictionary:
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:

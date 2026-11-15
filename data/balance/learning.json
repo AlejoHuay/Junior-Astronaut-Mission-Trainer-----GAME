@@ -1,0 +1,15 @@
+{
+  "first": "Tu primer sol: mira las reservas. Elige un plan y compara cómo terminarían. Cuidar el cultivo hoy prepara comida para después; producir oxígeno o investigar usa ese mismo turno. Puedes cambiar de plan antes de ejecutarlo.",
+  "crop": "Ya invertiste en el cultivo. Otro cuidado consecutivo permite cosechar; cambiar de tarea pierde el progreso. Mira cuándo llegará la comida y cuánto oxígeno queda.",
+  "alert": "Hoy hay alerta solar. Refugiarte ocupa tu turno y consume oxígeno del equipo. Un interior reforzado previamente permite trabajar dentro; salir sigue siendo inseguro. La radiación es energía transportada por partículas u ondas; aquí no calculamos dosis ni daño médico.",
+  "warning": "Mañana habrá alerta. Puedes preparar el interior hoy con materiales, o reservar mañana para refugiarte. ¿Qué tarea estarás dejando de hacer?",
+  "radio": "La Tierra todavía no respondió. Decide con las reservas que tienes: el mensaje traerá consejo para producir oxígeno aquí, no cajas de suministros.",
+  "later": "Antes de ejecutar, compara las reservas finales y las tareas pendientes. Una opción útil hoy puede dejar poco tiempo para otra mañana.",
+  "glossary": "SOL: un día marciano; en el juego avanzas uno al ejecutar un plan.\nRESERVA: lo que tienes almacenado para usar más tarde.\nENERGÍA: permite operar equipos; los paneles recargan al final del turno, hasta llenar la batería.\nOXÍGENO: lo producimos con energía y lo consumimos cada sol.\nALIMENTOS: comemos de la reserva mientras esperamos la cosecha.\nRADIACIÓN: energía que viaja como partículas u ondas. Nuestro refugio es una regla educativa, sin cálculos médicos.\nCOMUNICACIÓN: esperar una respuesta no significa recibir suministros. Dos soles es un tiempo ficticio para ver esa espera.\nHALLAZGOS: objetivo opcional; no sustituyen las reservas.",
+  "harvest_lesson": "Invertiste varios turnos antes de recibir comida. En cultivos reales los tiempos son mucho mayores: OSD-267 describe una cosecha de VEG-01A a los 33 días; nuestros dos cuidados son ficción.",
+  "interruption_lesson": "Cambiar de trabajo interrumpió al menos un cultivo: la energía ya gastada no volvió. Mira en la bitácora qué tarea elegiste en su lugar.",
+  "shelter_lesson": "Usaste el refugio: renunciaste a otras tareas de esos soles para mantener la protección. El blindaje pasivo no gastó electricidad por sí mismo.",
+  "radio_lesson": "Pediste consejo: pagaste energía y esperaste. La respuesta ayuda a producir localmente; no transporta materiales desde la Tierra.",
+  "science_lesson": "Dedicaste recursos a investigar. Compara esos hallazgos con las reservas con las que terminaste.",
+  "reflection": "Para tu próxima misión: ¿qué decisión cambiarías y qué recurso o tarea sacrificarías? Puedes repetir escenario y semilla para comparar."
+}
