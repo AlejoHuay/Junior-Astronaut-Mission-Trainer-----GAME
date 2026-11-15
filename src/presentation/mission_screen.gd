@@ -35,7 +35,8 @@ func _ready() -> void:
 	if config.is_empty() or learning.is_empty():
 		_label(self, provider.error, 24)
 		return
-	session = MissionSession.new(config)
+	session = MissionSession.new(config, MissionStore.new())
+	session.restore()
 	session.changed.connect(_show_mission)
 	session.message.connect(func(text: String): status.text = text)
 	_show_menu()
@@ -151,10 +152,13 @@ func _show_menu() -> void:
 	scenario_description = _label(content, "", 19, MUTED)
 	scenario_picker.item_selected.connect(_scenario_selected)
 	_scenario_selected(scenario_picker.selected)
-	var start_button := _button(content, "Comenzar misión  →", func():
+	var start_button := _button(content, "Comenzar misión", func():
 		selected_action = "support"
 		session.start(int(seed_input.value), str(scenario_picker.get_item_metadata(scenario_picker.selected))))
 	start_button.grab_focus()
+	if session.state != null:
+		_button(content, "Continuar misión guardada", _show_mission)
+	_label(content, session.storage_notice if not session.storage_notice.is_empty() else "Guardado automático al comenzar y al terminar cada sol. Comenzar reemplaza la misión anterior.", 18, MUTED)
 	_button(content, "Fuentes y créditos", _show_sources)
 	_button(content, "Cómo jugar · palabras de la misión", _show_help)
 	_preferences()
@@ -167,6 +171,8 @@ func _scenario_selected(index: int) -> void:
 func _show_mission() -> void:
 	_page()
 	var state := session.state
+	if not session.storage_notice.is_empty():
+		_label(content, session.storage_notice, 20)
 	_label(content, "SOL %d / 7 · %s · Semilla %d" % [state.sol, session.rules.config.scenarios[state.scenario_id].label, state.mission_seed], 28)
 	var base := BaseView.new()
 	base.state = state
@@ -189,7 +195,7 @@ func _show_mission() -> void:
 	var radio_text := state.radio_message if not state.radio_message.is_empty() else "Sin consulta enviada. Una respuesta tarda %d soles simulados." % session.rules.config.communication_delay
 	_label(content, "RADIO · " + radio_text, 18, MUTED)
 	_label(content, "BASE · %s · Materiales %d · Paneles: %s" % ["Interior reforzado" if state.reinforced else "Refugio listo; interior sin refuerzo", state.materials, "averiados" if state.panel_fault else "operativos"], 18, MUTED)
-	_label(content, "CULTIVO · %d / %d cuidados consecutivos → +%d comida. Tiempo acelerado ficticio; otra tarea pierde el progreso." % [state.crop_progress, session.rules.config.crop_turns, session.rules.config.harvest_food], 18, MUTED)
+	_label(content, "CULTIVO · %d / %d cuidados consecutivos : +%d comida. Tiempo acelerado ficticio; otra tarea pierde el progreso." % [state.crop_progress, session.rules.config.crop_turns, session.rules.config.harvest_food], 18, MUTED)
 	status = _label(content, "Consumo base: oxígeno −%d, comida −%d · Solar disponible: %d. Vista previa solo del sol actual." % [session.rules.config.oxygen_per_sol, session.rules.config.food_per_sol, maxi(0, state.solar_output - (int(session.rules.config.panel_fault_loss) if state.panel_fault else 0))], 18)
 	if state.phase == MissionState.Phase.FINISHED:
 		_label(content, state.outcome, 28)
@@ -212,7 +218,7 @@ func _show_mission() -> void:
 		action_detail = _label(content, "", 18, MUTED)
 		action_preview = _label(content, "", 18, ACCENT)
 		var expected_sol: int = state.sol
-		execute_button = _button(content, "Ejecutar plan y terminar sol →", func():
+		execute_button = _button(content, "Ejecutar plan y terminar sol", func():
 			if sound_enabled:
 				cue.play()
 			session.choose(selected_action, expected_sol))
@@ -277,7 +283,7 @@ func _show_help() -> void:
 	_page()
 	_label(content, "Comandar es elegir", 36)
 	_label(content, learning.first + "\n\n" + learning.glossary, 22)
-	_label(content, "Teclado: Tab cambia de control; flechas eligen un plan; Enter o Espacio activa. Seleccionar no gasta nada. Ejecutar avanza un sol.\nLas preferencias se mantienen durante esta sesión. Recargar aún reinicia la misión.", 20, MUTED)
+	_label(content, "Teclado: Tab cambia de control; flechas eligen un plan; Enter o Espacio activa. Seleccionar no gasta nada. Ejecutar avanza un sol.\nTras recargar, usa Continuar misión guardada. Las preferencias se mantienen solo durante esta sesión.", 20, MUTED)
 	_button(content, "Volver a la misión" if session.state != null else "Volver al menú", _show_mission if session.state != null else _show_menu).grab_focus()
 
 func _history() -> String:
@@ -336,9 +342,9 @@ func _show_sources() -> void:
 	for record in science_catalog.get("records", []):
 		_label(content, record.title + " · HISTÓRICO", 24, ACCENT)
 		_label(content, record.observation + "\n" + record.context + "\n" + record.lesson + "\nLímite: " + record.limits, 19)
-		_button(content, "Abrir registro " + record.id + " ↗", func(): OS.shell_open(record.url))
+		_button(content, "Abrir registro " + record.id + " (web)", func(): OS.shell_open(record.url))
 	for item in [["DONKI · Eventos solares", "https://ccmc.gsfc.nasa.gov/tools/DONKI/"], ["OSDR · Estudios de biología espacial", "https://osdr.nasa.gov/bio/repo/search?q=&data_source=cgene,alsda,esa&data_type=study"], ["RadLab · Mediciones contextualizadas", "https://visualization.osdr.nasa.gov/radlab/gui/data-api/"]]:
-		_button(content, item[0] + " ↗", func(): OS.shell_open(item[1]))
+		_button(content, item[0] + " (web)", func(): OS.shell_open(item[1]))
 	_label(content, "Tres fuentes históricas archivadas. Lecturas y explicaciones disponibles sin conexión.\nCreado con Godot Engine (licencia MIT). Interfaz y gráficos originales del proyecto.", 19, MUTED)
 	_button(content, "Volver", _show_mission if session.state != null else _show_menu).grab_focus()
 

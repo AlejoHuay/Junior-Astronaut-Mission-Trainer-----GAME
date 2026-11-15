@@ -17,6 +17,7 @@ func exercise_scene() -> void:
 		printerr("FAIL: presentation preference controls")
 		quit(1)
 		return
+	screen.session.store = null # Scene checks must not overwrite a real local mission.
 	screen.session.start(214, "demo")
 	for action in ["grow", "grow", "support", "shelter", "combined", "eva", "support"]:
 		for index in range(screen.action_picker.item_count):

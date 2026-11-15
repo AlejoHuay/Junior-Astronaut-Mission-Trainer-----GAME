@@ -1,5 +1,21 @@
 # Arquitectura y reglas
 
+## Persistencia (F4-01)
+
+`MissionStore`, inyectado en `MissionSession`, escribe `user://mission.save` como JSON versión 1.
+Escribe primero un temporal, comprueba escritura y lo renombra. Un error se muestra sin detener
+la simulación. Guarda al iniciar y tras cada acción válida; no guarda selecciones ni órdenes rechazadas.
+El snapshot incluye pendientes, cultivo, historial, final y cadenas decimales de semilla/RNG de 64 bits.
+Al cargar, la aplicación reproduce hasta siete acciones con las reglas actuales y compara todo el
+snapshot normalizado como JSON; solo entonces sustituye la misión. Rechaza esquemas incompatibles,
+estados alterados y archivos mayores de 256 KiB. Cambiar el balance puede invalidar guardados antiguos.
+No es un sistema de autenticación; evita estados inválidos. Las pruebas usan un archivo separado.
+
+En web la persistencia depende del almacenamiento del navegador para ese origen. Sigue pendiente
+verificar recarga y cierre/reapertura en Edge; escribir al filesystem de Godot no demuestra por sí
+solo persistencia durable en el navegador. No cambiar host/puerto durante la prueba. Las preferencias
+son de sesión. No hay sincronización entre dispositivos, exportación de guardados ni migraciones.
+
 `MissionState` y `MissionRules` son RefCounted del dominio, sin archivos, red o UI.
 `GameData` valida y lee JSON en infraestructura. La aplicación coordina reglas/proveedores
 y emite señales; la presentación no modifica directamente los recursos.

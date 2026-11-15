@@ -29,6 +29,7 @@ switch ($Task) {
         python scripts/check_science.py
         if ($LASTEXITCODE -ne 0) { throw 'Procedencia cientifica invalida.' }
         Invoke-Godot @('--headless','--script','res://tests/run_tests.gd')
+        Invoke-Godot @('--headless','--script','res://tests/persistence_tests.gd')
         Invoke-Godot @('--headless','--script','res://tests/smoke_scene.gd')
     }
     'export' {
