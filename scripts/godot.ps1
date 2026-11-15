@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('version','import','run','test','export','verify')]
+    [ValidateSet('version','import','run','test','export','verify','package')]
     [string]$Task = 'verify'
 )
 $ErrorActionPreference = 'Stop'
@@ -42,5 +42,13 @@ switch ($Task) {
         & $PSCommandPath import
         & $PSCommandPath test
         & $PSCommandPath export
+    }
+    'package' {
+        & $PSCommandPath verify
+        Invoke-Godot @('--headless','--script','res://scripts/export_licenses.gd')
+        python scripts/package_web.py
+        if ($LASTEXITCODE -ne 0) { throw 'No se pudo verificar el paquete ZIP.' }
+        python scripts/check_delivery.py
+        if ($LASTEXITCODE -ne 0) { throw 'La entrega extraida no paso la comprobacion HTTP.' }
     }
 }

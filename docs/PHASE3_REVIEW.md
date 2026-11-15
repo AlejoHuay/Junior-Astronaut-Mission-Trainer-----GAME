@@ -28,4 +28,3 @@ sol y tamaño de ventana. Ensayo con niños y duración real de partida siguen p
 La revisión parcial del agente observó módulos, cultivo, alerta/refugio, teclado, ayuda y
 controles de preferencias; no cerró la aceptación completa. El equipo realizará ahora la
 revisión con el ZIP según [TESTING.md](TESTING.md). Los casos finales siguen pendientes.
-

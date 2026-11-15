@@ -7,7 +7,7 @@ pendiente de medir con jugadores. Interfaz en español, sin cuentas ni APIs dura
 ## Estado actual
 
 **F4-01 implementada: guardado automático y continuación. Aceptación web pendiente.**
-F4-02: protocolo de revisión integral preparado. Siguiente: F4-03, paquete ZIP; F4-04, pitch.
+F4-02: protocolo de revisión integral preparado. F4-03: empaquetado automatizado; siguiente F4-04, pitch.
 El usuario comprobará persistencia en Edge; sus compañeros harán la revisión final con el ZIP.
 Fases 3 y 4 no se declaran aceptadas hasta registrar esos resultados manuales.
 El usuario confirmó la revisión solicitada de Fase 2 el 15-11-2026. Es validación manual del
@@ -30,6 +30,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 import
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 test
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 export
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 verify
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/godot.ps1 package
 python -m http.server 8060 --bind 127.0.0.1 --directory build/web
 ```
 
@@ -43,6 +44,12 @@ En otra máquina descarga las plantillas oficiales **4.7.2** y ejecuta
 `python scripts/install_templates.py ruta/al/archivo.tpz`. No usar `web_debug.zip`/`web_release.zip`,
 que llevan hilos. Cada exportación ejecuta `python scripts/check_web_export.py build/web` y rechaza
 un WASM con memoria compartida. Paquete generado: `build/web`, fuera de Git; no publicado.
+
+Entrega para compañeros: `build/Junior-Astronaut-Mission-Trainer-F4.zip` y su `.zip.sha256`.
+Incluye LEEME, web, documentación, licencias del motor y manifiesto de archivos/commit fuente.
+[Cómo probar y reproducir el paquete](docs/DELIVERY.md). Godot no es necesario para jugar el ZIP.
+La tarea `package` ejecuta toda la verificación y comprueba el ZIP extraído mediante HTTP local;
+esto no equivale a revisión visual ni valida almacenamiento de Edge.
 
 ## Arquitectura y funcionalidades
 
@@ -82,7 +89,7 @@ comprueba victoria con 5 hallazgos, preferencias, ayuda, fuentes y resumen coher
 Persistencia: **631 comprobaciones aprobadas**, continuidad tras cada turno en tres escenarios,
 tres semillas y tres secuencias, finales guardados, archivos inválidos y almacenamiento no disponible.
 Las pruebas headless no demuestran persistencia del almacenamiento de Edge.
-Última verificación: `build/verify-f401-final.txt` (archivo local ignorado).
+Última verificación: `build/verify-delivery.txt` (archivo local ignorado).
 
 **48 partidas automatizadas completas:** 4 estrategias × 3 escenarios × 4 semillas.
 Resultados de Aurora con semilla 214:
@@ -154,3 +161,4 @@ Cultivo acelerado, oxígeno de traslado y dos soles de radio son abstracciones e
 | F3-04 | Guía contextual, glosario, causas de recursos y aprendizaje según historial | 684 aserciones, procedencia, escenas, exportación sin hilos y HTTP 200; revisión visual pendiente | Aceptación visual; F4-01 |
 | F4-01 | Guardado versionado por turno, continuar, validación por replay y avisos de error; texto sin flechas problemáticas | 684 aserciones de dominio, 631 de persistencia, escenas y exportación; revisión Edge pendiente a cargo del usuario | F4-02: revisión integral y protocolo manual |
 | F4-02 | Matriz de aceptación, resultados esperados y plantilla de reporte para el equipo | Evidencia automatizada F4-01 revisada; M01–M12 explícitamente pendientes, sin nuevas partidas web | F4-03: ZIP reproducible |
+| F4-03 | Comando package, ZIP con manifiesto/SHA-256, instrucciones, licencias del motor y comprobación HTTP de la extracción | Suite 684 + 631, escenas, ciencia, exportación sin hilos y ZIP correctos; HTTP verificado aparte | F4-04: pitch y documentación final |
