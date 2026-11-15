@@ -6,15 +6,11 @@ pendiente de medir con jugadores. Interfaz en español, sin cuentas ni APIs dura
 
 ## Estado actual
 
-**Fases 1 y 2 implementadas. Última iteración: F2-05.** Los criterios funcionales de Fase 2 están
-cubiertos por pruebas: cinco sistemas, costos, consecuencias diferidas, varias estrategias y orden
-de resolución. **Revisión visual final de Fase 2 pendiente** por bloqueo de Computer Use.
-Siguiente fase de desarrollo: **F3-01 — DONKI histórico verificable**.
+**Fase 3 en curso: F3-01 implementada; siguiente F3-02 (OSDR/RadLab).**
+El usuario confirmó la revisión solicitada de Fase 2 el 15-11-2026. Es validación manual del
+usuario, separada de nuestras pruebas automatizadas. Fases 1 y 2 aceptadas.
+Aurora vincula su alerta ficticia con una llamarada histórica DONKI; fuentes disponibles sin red.
 
-F2-03 añade refugio, refuerzo con materiales y actividad exterior; F2-04 conecta polvo, avería,
-alerta solar y radio diferida; F2-05 añade objetivos opcionales, finales explicados, escenarios y balance.
-El usuario confirmó previamente la cosecha 5 → 4 → 7 de F2-02. Esa confirmación no se presenta como
-validación manual de las nuevas pantallas o partidas completas de Fase 2.
 Rama `feat/mission-trainer`; main, origin y commit inicial conservados. Sin push ni merge.
 
 ## Entorno y ejecución
@@ -92,8 +88,8 @@ Estas pruebas no demuestran diversión, equilibrio óptimo ni duración de 5–1
 
 Confirmados en versiones anteriores: menú en Edge por el agente; ambos finales de Fase 1 y cosecha
 5 → 4 → 7 por el usuario; restricciones energéticas F2-01 por el agente. La revisión visual final
-de Fase 2 se intentó, pero Computer Use detuvo la sesión porque no pudo determinar con confianza
-la URL actual de Edge. No se declara esa revisión como aprobada. Sigue pendiente [este protocolo](docs/BALANCE.md#protocolo-manual-final-pendiente).
+de Fase 2 fue confirmada por el usuario el 15-11-2026, tras el bloqueo previo de Computer Use.
+La nueva interfaz de Fase 3 requiere su propia revisión visual.
 
 Prueba rápida de Aurora/214: **cultivo, cultivo, oxígeno, refugio, ambos, exterior, oxígeno**.
 Final esperado: energía 8, oxígeno 4, alimentos 2, ciencia 5 y una muestra exterior.
@@ -110,8 +106,9 @@ El entorno restringido requiere acceso a cachés normales de Godot para importar
 [DONKI](https://ccmc.gsfc.nasa.gov/tools/DONKI/),
 [OSDR](https://osdr.nasa.gov/bio/repo/search?q=&data_source=cgene,alsda,esa&data_type=study),
 [RadLab](https://visualization.osdr.nasa.gov/radlab/gui/data-api/).
-Aún no hay registros reales incorporados: **todos los eventos de Fase 2 son ficticios**. El juego no
-está avalado por NASA. Los valores de balance no son dosis, riesgos clínicos ni observaciones de Marte.
+DONKI histórico archivado: llamarada X3.9 del 10-05-2024 vinculada con Aurora.
+[Procedencia y límites](docs/SCIENCE.md). Los efectos del escenario siguen siendo ficticios.
+El juego no está avalado por NASA. El balance no representa dosis ni observaciones de Marte.
 Cultivo acelerado, oxígeno de traslado y dos soles de radio son abstracciones educativas, no mediciones.
 
 ## Registro de iteraciones
@@ -130,3 +127,4 @@ Cultivo acelerado, oxígeno de traslado y dos soles de radio son abstracciones e
 | F2-03 | Refugio, refuerzo con 2 materiales y trabajo, salidas con oxígeno extra y parada de seguridad | Suite, escenas y exportación sin hilos pasan; cultivo 5 → 4 → 7 validado por usuario | F2-04: eventos y comunicaciones |
 | F2-04 | Catálogo validado de eventos, polvo, avería/reparación, aviso solar y radio con consejo diferido | 284 aserciones; escenas; exportación sin hilos; determinismo y entrega única comprobados | F2-05: objetivos, finales y balance |
 | F2-05 | Objetivos opcionales, finales específicos, selector de escenarios/planes y comparación de estrategias | 679 aserciones, 48 partidas y controles/escenas pasan; exportación sin hilos; revisión visual final bloqueada por URL de Edge | Verificación visual pendiente; F3-01: DONKI histórico |
+| F3-01 | Archivo DONKI original/curado, adaptador validado, Aurora trazable y fuentes | 684 aserciones, procedencia, escenas y exportación sin hilos pasan | F3-02 |

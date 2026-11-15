@@ -10,6 +10,17 @@ func check(condition: bool, message: String) -> void:
 		printerr("FAIL: ", message)
 
 func _initialize() -> void:
+	var science := ScienceData.new()
+	var catalog := science.load_catalog()
+	check(not catalog.is_empty(), "Science catalog loads")
+	check(not science.validate({"schema_version": 1, "records": [42]}), "Reject malformed science record")
+	check(not science.validate({"schema_version": 2, "records": []}), "Reject unsupported science schema")
+	var corrupt := catalog.duplicate(true)
+	corrupt.records[0].historical = false
+	check(not science.validate(corrupt), "Reject unmarked historical evidence")
+	corrupt = catalog.duplicate(true)
+	corrupt.records.append(corrupt.records[0])
+	check(not science.validate(corrupt), "Reject duplicate science identifiers")
 	var data := GameData.new()
 	var config := data.load_balance()
 	check(not config.is_empty(), "Balance loads")

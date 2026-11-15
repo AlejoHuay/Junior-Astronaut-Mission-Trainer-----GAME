@@ -5,6 +5,8 @@ const PAPER := Color("eaf1f7")
 const MUTED := Color("a8bdce")
 const ACCENT := Color("74e0c2")
 
+var science_catalog: Dictionary
+var science_provider := ScienceData.new()
 var session: MissionSession
 var content: VBoxContainer
 var status: Label
@@ -20,6 +22,7 @@ var seed_input: SpinBox
 
 func _ready() -> void:
 	_setup_theme()
+	science_catalog = science_provider.load_catalog()
 	var provider := GameData.new()
 	var config := provider.load_balance()
 	if config.is_empty():
@@ -106,6 +109,9 @@ func _show_mission() -> void:
 	_label(content, "SOL %d / 7 · %s · Semilla %d" % [state.sol, session.rules.config.scenarios[state.scenario_id].label, state.mission_seed], 28)
 	_label(content, "ENERGÍA  %d / %d     |     OXÍGENO  %d     |     ALIMENTOS  %d" % [state.energy, session.rules.config.battery_capacity, state.oxygen, state.food], 26, ACCENT)
 	_label(content, "Opcionales: hallazgos %d / %d · Muestras exteriores %d / 1. Sobrevivir completa la misión." % [state.science, session.rules.config.science_goal, state.samples], 17, MUTED)
+	var science_id: String = session.rules.config.scenarios[state.scenario_id].get("science_id", "")
+	if not science_id.is_empty():
+		_label(content, "Contexto histórico DONKI · 10 mayo 2024. Alerta y efectos marcianos ficticios; consulta Fuentes.", 17, MUTED)
 	var event: Dictionary = session.rules.config.events[state.current_event]
 	_label(content, "ENTORNO · %s — %s%s" % [event.label, event.description, "\n¡Mañana hay alerta solar! Prepara protección." if state.next_solar_alert else ""], 18, ACCENT)
 	var radio_text := state.radio_message if not state.radio_message.is_empty() else "Sin consulta enviada. Una respuesta tarda %d soles simulados." % session.rules.config.communication_delay
@@ -207,9 +213,15 @@ func _show_sources() -> void:
 	_page()
 	_label(content, "Ciencia que inspira la misión", 36)
 	_label(content, "Los números y tiempos del juego son inventados para aprender a planificar.\nNo representan dosis de radiación ni una base real. NASA no avala este juego.", 23)
+	if not science_provider.error.is_empty():
+		_label(content, science_provider.error, 20)
+	for record in science_catalog.get("records", []):
+		_label(content, record.title + " · HISTÓRICO", 24, ACCENT)
+		_label(content, record.observation + "\n" + record.context + "\n" + record.lesson + "\nLímite: " + record.limits, 19)
+		_button(content, "Abrir registro " + record.id + " ↗", func(): OS.shell_open(record.url))
 	for item in [["DONKI · Eventos solares", "https://ccmc.gsfc.nasa.gov/tools/DONKI/"], ["OSDR · Estudios de biología espacial", "https://osdr.nasa.gov/bio/repo/search?q=&data_source=cgene,alsda,esa&data_type=study"], ["RadLab · Mediciones contextualizadas", "https://visualization.osdr.nasa.gov/radlab/gui/data-api/"]]:
 		_button(content, item[0] + " ↗", func(): OS.shell_open(item[1]))
-	_label(content, "Registros concretos pendientes de incorporación.\nCreado con Godot Engine (licencia MIT). Interfaz y gráficos originales del proyecto.", 19, MUTED)
+	_label(content, "Registro DONKI archivado. OSDR y RadLab: incorporación pendiente.\nCreado con Godot Engine (licencia MIT). Interfaz y gráficos originales del proyecto.", 19, MUTED)
 	_button(content, "Volver", _show_mission if session.state != null else _show_menu).grab_focus()
 
 func _label(parent: Node, text: String, font_size: int, color: Color = PAPER) -> Label:

@@ -26,6 +26,8 @@ switch ($Task) {
     'import' { Invoke-Godot @('--headless','--editor','--import') }
     'run' { Invoke-Godot @() }
     'test' {
+        python scripts/check_science.py
+        if ($LASTEXITCODE -ne 0) { throw 'Procedencia cientifica invalida.' }
         Invoke-Godot @('--headless','--script','res://tests/run_tests.gd')
         Invoke-Godot @('--headless','--script','res://tests/smoke_scene.gd')
     }
