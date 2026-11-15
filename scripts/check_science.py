@@ -12,6 +12,14 @@ for record in catalog['records']:
         observations = json.loads(raw.read_text(encoding='utf-8'))
         assert record['observed'] in observations
         assert record['observed']['flrID'] == record['id']
+    elif record['id'] == 'OSD-267':
+        metadata = json.loads(raw.read_text(encoding='utf-8'))
+        assert metadata['study']['OSD-267']['studies'][0]['title'] == record['observed_title']
+    elif record['id'].startswith('RadLab-'):
+        table = json.loads(raw.read_text(encoding='utf-8'))
+        assert record['observed'] in [dict(zip(table['columns'], row)) for row in table['data']]
+        assert record['observed']['spacecraft'] == 'ISS'
+        assert record['units']['absorbed_dose_rate'] == '\u00b5Gy/h'
 scenarios = json.loads((root / 'data/events/scenarios.json').read_text(encoding='utf-8'))
 ids = [record['id'] for record in catalog['records']]
 assert scenarios['scenarios']['demo']['science_id'] in ids

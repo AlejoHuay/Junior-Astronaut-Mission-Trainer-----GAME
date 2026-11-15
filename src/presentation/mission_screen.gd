@@ -221,7 +221,7 @@ func _show_sources() -> void:
 		_button(content, "Abrir registro " + record.id + " ↗", func(): OS.shell_open(record.url))
 	for item in [["DONKI · Eventos solares", "https://ccmc.gsfc.nasa.gov/tools/DONKI/"], ["OSDR · Estudios de biología espacial", "https://osdr.nasa.gov/bio/repo/search?q=&data_source=cgene,alsda,esa&data_type=study"], ["RadLab · Mediciones contextualizadas", "https://visualization.osdr.nasa.gov/radlab/gui/data-api/"]]:
 		_button(content, item[0] + " ↗", func(): OS.shell_open(item[1]))
-	_label(content, "Registro DONKI archivado. OSDR y RadLab: incorporación pendiente.\nCreado con Godot Engine (licencia MIT). Interfaz y gráficos originales del proyecto.", 19, MUTED)
+	_label(content, "Tres fuentes históricas archivadas. Lecturas y explicaciones disponibles sin conexión.\nCreado con Godot Engine (licencia MIT). Interfaz y gráficos originales del proyecto.", 19, MUTED)
 	_button(content, "Volver", _show_mission if session.state != null else _show_menu).grab_focus()
 
 func _label(parent: Node, text: String, font_size: int, color: Color = PAPER) -> Label:
