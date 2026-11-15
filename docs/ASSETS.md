@@ -9,4 +9,8 @@ Los datos científicos y sus equipos se acreditan en [SCIENCE.md](SCIENCE.md) y 
 
 Las animaciones duran 0,7 s y no retrasan acciones ni modifican la simulación. El ajuste
 Reducir movimiento omite desplazamientos y resaltados de recursos. Los estados importantes
-también se expresan mediante texto. Preferencias conservadas durante la sesión, aún sin guardado.
+también se expresan mediante texto. Preferencias conservadas solo durante la sesión; el guardado
+de misión no incluye preferencias. El paquete incorpora `GODOT-LICENSES.txt`, generado desde
+el motor instalado con los avisos de copyright y textos de licencia de sus componentes.
+No se ha elegido una licencia de distribución para el código original del equipo; no se atribuye
+automáticamente la licencia MIT de Godot al proyecto.

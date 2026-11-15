@@ -6,8 +6,9 @@ pendiente de medir con jugadores. Interfaz en español, sin cuentas ni APIs dura
 
 ## Estado actual
 
-**F4-01 implementada: guardado automático y continuación. Aceptación web pendiente.**
-F4-02: protocolo de revisión integral preparado. F4-03: empaquetado automatizado; siguiente F4-04, pitch.
+**Candidata de Fase 4 preparada para revisión del equipo. Última iteración: F4-04.**
+Guardado, pruebas automatizadas, empaquetado, documentación y pitch implementados.
+Siguiente tarea: recibir los resultados M01–M12, corregir fallos y registrar la aceptación.
 El usuario comprobará persistencia en Edge; sus compañeros harán la revisión final con el ZIP.
 Fases 3 y 4 no se declaran aceptadas hasta registrar esos resultados manuales.
 El usuario confirmó la revisión solicitada de Fase 2 el 15-11-2026. Es validación manual del
@@ -48,6 +49,7 @@ un WASM con memoria compartida. Paquete generado: `build/web`, fuera de Git; no 
 Entrega para compañeros: `build/Junior-Astronaut-Mission-Trainer-F4.zip` y su `.zip.sha256`.
 Incluye LEEME, web, documentación, licencias del motor y manifiesto de archivos/commit fuente.
 [Cómo probar y reproducir el paquete](docs/DELIVERY.md). Godot no es necesario para jugar el ZIP.
+[Pitch de 2–3 minutos](docs/DEMO.md) · [Pruebas pendientes y reporte](docs/TESTING.md).
 La tarea `package` ejecuta toda la verificación y comprueba el ZIP extraído mediante HTTP local;
 esto no equivale a revisión visual ni valida almacenamiento de Edge.
 
@@ -162,3 +164,4 @@ Cultivo acelerado, oxígeno de traslado y dos soles de radio son abstracciones e
 | F4-01 | Guardado versionado por turno, continuar, validación por replay y avisos de error; texto sin flechas problemáticas | 684 aserciones de dominio, 631 de persistencia, escenas y exportación; revisión Edge pendiente a cargo del usuario | F4-02: revisión integral y protocolo manual |
 | F4-02 | Matriz de aceptación, resultados esperados y plantilla de reporte para el equipo | Evidencia automatizada F4-01 revisada; M01–M12 explícitamente pendientes, sin nuevas partidas web | F4-03: ZIP reproducible |
 | F4-03 | Comando package, ZIP con manifiesto/SHA-256, instrucciones, licencias del motor y comprobación HTTP de la extracción | Suite 684 + 631, escenas, ciencia, exportación sin hilos y ZIP correctos; HTTP verificado aparte | F4-04: pitch y documentación final |
+| F4-04 | Pitch de 2–3 minutos con costo y cosecha diferida, documentación consolidada y candidata para compañeros | Documentos contrastados con reglas; paquete regenerado con manifiesto y HTTP; aceptación manual pendiente | Recibir M01–M12 y corregir hallazgos; no cerrar Fases 3/4 antes |

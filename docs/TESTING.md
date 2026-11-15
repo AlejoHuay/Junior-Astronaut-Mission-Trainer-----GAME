@@ -14,6 +14,9 @@ Comenzar una misión reemplaza la anterior. Preferencias de sonido/movimiento/co
 
 ## Casos manuales (todos pendientes)
 
+Abreviaturas: cultivo = Cuidar el cultivo; oxígeno = Renovar oxígeno; refugio = Entrar al refugio;
+ambos = Repartir entre ambos; exterior = Explorar el exterior; radio = Consultar a la Tierra.
+
 | ID | Responsable | Pasos | Resultado esperado |
 |---|---|---|---|
 | M01 | Compañeros | Extraer ZIP, iniciar servidor y abrir URL | Menú jugable, sin bloqueo en logo ni errores en consola |
@@ -44,8 +47,10 @@ si el juego informa del problema. No se garantiza persistencia en navegación pr
 - Ciencia: hashes y observaciones de tres registros archivados.
 - Exportación: WASM sin memoria compartida; no requiere aislamiento para SharedArrayBuffer.
 
-Último registro de la suite: `build/verify-f401-final.txt`. Una nueva ejecución de entrega se registra
-en README. Estas pruebas no sustituyen M01–M12 ni acreditan rendimiento en otros equipos.
+Último registro de la suite: `build/verify-delivery.txt`. ZIP extraído y hashes verificados;
+todos los archivos web respondieron HTTP 200 con bytes idénticos y MIME WASM correcto mediante
+`python scripts/check_delivery.py`. Estas pruebas no sustituyen M01–M12 ni acreditan rendimiento
+en otros equipos. No se ejecutó otra revisión web tras delegarla al usuario y sus compañeros.
 
 ## Plantilla para devolver resultados
 

@@ -59,7 +59,7 @@ no avanza el tiempo ni destruye el cultivo. La previsión de cosecha incluye sol
 Un cultivo iniciado el sol 7 anuncia cosecha en el sol 8, fuera de la misión; no se acelera al terminar.
 
 `crop_progress` forma parte del snapshot; el presupuesto e historial guardan cosecha, interrupción,
-progreso siguiente y fecha condicionada. La futura persistencia deberá conservarlo.
+progreso siguiente y fecha condicionada. La persistencia conserva y valida ese progreso.
 Esta compresión no representa tiempos agrícolas reales ni implica que cualquier interrupción real
 mate plantas: simplifica la necesidad de mantener condiciones y dedicar trabajo continuado.
 
