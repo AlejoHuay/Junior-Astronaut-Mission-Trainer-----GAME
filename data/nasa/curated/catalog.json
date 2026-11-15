@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": "2024-05-10T06:27:00-FLR-001",
+      "title": "DONKI: llamarada del 10 de mayo de 2024",
+      "url": "https://ccmc.gsfc.nasa.gov/DONKI/view/FLR/30666/-1",
+      "retrieved": "2026-11-15",
+      "historical": true,
+      "context": "Observación solar, instrumento GOES-P: EXIS 1.0-8.0; catálogo M2M_CATALOG.",
+      "observation": "Clase X3.9; inicio 06:27 UTC, máximo 06:54 UTC y fin 07:06 UTC del 10-05-2024.",
+      "lesson": "La actividad del Sol merece atención al planificar una misión. Aurora usa este registro histórico como contexto narrativo de su alerta.",
+      "limits": "La alerta del sol 4 y el refugio son reglas ficticias. Este registro no mide una dosis en Marte ni predice el riesgo de nuestra base.",
+      "raw_path": "res://data/nasa/raw/donki-flr-2024-05-10.json",
+      "raw_sha256": "77cd9c51213b52db7f5a5894ff70a61718d6ce0c87ef344b08c40467eea09ad1",
+      "query_url": "https://ccmc.gsfc.nasa.gov/DONKI-API/get/FLR?startDate=2024-05-10&endDate=2024-05-10",
+      "observed": {
+        "flrID": "2024-05-10T06:27:00-FLR-001",
+        "catalog": "M2M_CATALOG",
+        "instruments": [
+          {
+            "displayName": "GOES-P: EXIS 1.0-8.0"
+          }
+        ],
+        "beginTime": "2024-05-10T06:27Z",
+        "peakTime": "2024-05-10T06:54Z",
+        "endTime": "2024-05-10T07:06Z",
+        "classType": "X3.9",
+        "sourceLocation": "S18W37",
+        "activeRegionNum": 13664,
+        "note": "",
+        "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/FLR/30666/-1",
+        "linkedEvents": [
+          {
+            "activityID": "2024-05-10T07:12:00-CME-001"
+          },
+          {
+            "activityID": "2024-05-10T12:59:00-SEP-001"
+          },
+          {
+            "activityID": "2024-05-10T13:02:00-SEP-001"
+          },
+          {
+            "activityID": "2024-05-10T13:35:00-SEP-001"
+          },
+          {
+            "activityID": "2024-05-10T14:50:00-SEP-001"
+          }
+        ],
+        "sentNotifications": [
+          {
+            "messageID": "20240510-AL-001",
+            "messageIssueTime": "2024-05-10T06:51Z",
+            "messageURL": "https://ccmc.gsfc.nasa.gov/DONKI/view/Alert/30667/1"
+          },
+          {
+            "messageID": "20240510-AL-002",
+            "messageIssueTime": "2024-05-10T11:37Z",
+            "messageURL": "https://ccmc.gsfc.nasa.gov/DONKI/view/Alert/30668/1"
+          }
+        ],
+        "submissionTime": "2024-05-10T11:37Z",
+        "versionId": 2
+      },
+      "units": {
+        "classType": "clasificación de llamarada; no dosis",
+        "times": "UTC"
+      }
+    },
+    {
+      "retrieved": "2026-11-15",
+      "historical": true,
+      "raw_path": "res://data/nasa/raw/osdr-267-metadata.json",
+      "raw_sha256": "7c368af9d31cfd8d3fb3ecbf4a9582cdc69050a6c3a5a05f12fd1433f8c02e95",
+      "id": "OSD-267",
+      "title": "OSDR: lechugas en la estación espacial",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-267",
+      "query_url": "https://osdr.nasa.gov/osdr/data/osd/meta/267",
+      "context": "Lactuca sativa, variedad Outredgeous y microbiota de hojas/raíces; Veggie, ISS; comparación con cultivos terrestres.",
+      "observation": "El estudio VEG-01A incluye análisis de los microorganismos de lechugas cultivadas en la ISS y en Tierra.",
+      "lesson": "Cultivar requiere condiciones controladas y tiempo. En el juego debes reservar energía para cuidar el invernadero.",
+      "limits": "Se leyó la ficha y los protocolos, no se reanalizaron secuencias. No demuestra cosechas en dos soles ni producción en Marte; tampoco basta para afirmar que cualquier cultivo espacial es seguro.",
+      "observed_title": "Microbiological and nutritional analysis of lettuce crops grown on the International Space Station-VEG01A",
+      "publication_doi": "10.3389/fpls.2020.00199",
+      "units": {
+        "growth_duration": "días; el juego usa soles ficticios"
+      }
+    },
+    {
+      "retrieved": "2026-11-15",
+      "historical": true,
+      "raw_path": "res://data/nasa/raw/radlab-dostel-2022-04-01.json",
+      "raw_sha256": "61d58bd4948c7bc0921a7238eff22260c7327ba023bb68548701222dd1c029e8",
+      "id": "RadLab-DosTel2-2022-04-01T23:00:00",
+      "title": "RadLab: una lectura orbital",
+      "url": "https://visualization.osdr.nasa.gov/radlab/gui/data-api/",
+      "query_url": "https://visualization.osdr.nasa.gov/radlab/api/?spacecraft=ISS&instrument=DosTel&timestamp%3E=2022-04-01T23%3A00&timestamp%3C2022-04-01T23%3A10&absorbed_dose_rate&celestial_body&trajectory&module&format=json",
+      "context": "DosTel2, módulo Columbus, ISS en órbita terrestre baja (LEO). Ventana archivada: 2022-04-01 23:00 a 23:10; timestamps tal como los entrega la API.",
+      "observation": "DosTel2 registró 10.2160856666667 µGy/h en 2022-04-01T23:00:00. Es una tasa de dosis absorbida del instrumento.",
+      "lesson": "Los instrumentos permiten estudiar la radiación en un lugar concreto. Planificar protección puede ocupar el tiempo de otras tareas.",
+      "limits": "Esta lectura de la ISS no es una dosis de la tripulación ni una medición en Marte. No determina la alerta, el blindaje ni un riesgo médico en el juego. No se convierte a otras unidades.",
+      "observed": {
+        "timestamp": "2022-04-01T23:00:00",
+        "instrument_id": "DosTel2",
+        "absorbed_dose_rate": 10.2160856666667,
+        "celestial_body": "Earth",
+        "instrument": "DosTel2",
+        "module": "Columbus",
+        "spacecraft": "ISS",
+        "trajectory": "LEO"
+      },
+      "units": {
+        "absorbed_dose_rate": "µGy/h"
+      }
+    }
+  ]
+}

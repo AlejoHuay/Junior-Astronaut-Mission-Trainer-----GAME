@@ -1,0 +1,6 @@
+{
+    "cautious": ["grow", "grow", "support", "shelter", "support", "research", "support"],
+    "scientific": ["grow", "grow", "support", "shelter", "combined", "eva", "support"],
+    "reinforced": ["reinforce", "grow", "grow", "support", "combined", "research", "support"],
+    "radio": ["grow", "grow", "support", "shelter", "radio", "support", "support"]
+}

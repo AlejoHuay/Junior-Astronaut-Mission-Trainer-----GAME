@@ -1,0 +1,72 @@
+{
+  "events": {
+    "clear": {
+      "label": "Paneles despejados",
+      "description": "Producción solar normal este sol.",
+      "solar": 4
+    },
+    "dust": {
+      "label": "Polvo en suspensión",
+      "description": "Llega menos luz a los paneles: solo 2 de energía solar este sol.",
+      "solar": 2
+    },
+    "solar": {
+      "label": "Alerta solar simulada",
+      "description": "Usa el refugio o trabaja dentro con refuerzo instalado previamente. Salir detiene la misión.",
+      "solar": 4
+    },
+    "failure": {
+      "label": "Avería de paneles",
+      "description": "Pierdes 2 de producción solar por sol hasta reparar con materiales locales.",
+      "solar": 4
+    }
+  },
+  "scenarios": {
+    "training": {
+      "label": "Entrenamiento tranquilo",
+      "description": "Aprende reservas y cultivo sin eventos adversos.",
+      "timeline": [
+        "clear",
+        "clear",
+        "clear",
+        "clear",
+        "clear",
+        "clear",
+        "clear"
+      ]
+    },
+    "demo": {
+      "label": "Misión Aurora",
+      "description": "Polvo en sol 3, alerta solar en sol 4 y avería en sol 6. Todos son eventos ficticios. Contexto histórico: DONKI, 10 de mayo de 2024. La cronología y los efectos en Marte son ficticios.",
+      "timeline": [
+        "clear",
+        "clear",
+        "dust",
+        "solar",
+        "clear",
+        "failure",
+        "clear"
+      ],
+      "science_id": "2024-05-10T06:27:00-FLR-001"
+    },
+    "exploration": {
+      "label": "Desafío de exploración",
+      "description": "Alerta en sol 4. Las condiciones de los soles 3 y 6 dependen de la semilla.",
+      "timeline": [
+        "clear",
+        "clear",
+        [
+          "clear",
+          "dust"
+        ],
+        "solar",
+        "clear",
+        [
+          "dust",
+          "failure"
+        ],
+        "clear"
+      ]
+    }
+  }
+}
