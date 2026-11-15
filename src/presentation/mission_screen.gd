@@ -19,9 +19,13 @@ var scenario_picker: OptionButton
 var scenario_description: Label
 var log_text: Label
 var seed_input: SpinBox
+var reduced_motion: bool = false
+var sound_enabled: bool = false
+var cue: AudioStreamPlayer
 
 func _ready() -> void:
 	_setup_theme()
+	_setup_audio()
 	science_catalog = science_provider.load_catalog()
 	var provider := GameData.new()
 	var config := provider.load_balance()
@@ -51,10 +55,33 @@ func _setup_theme() -> void:
 			style.border_color = ACCENT
 			style.set_border_width_all(3)
 		custom.set_stylebox(state, "Button", style)
+		custom.set_stylebox(state, "OptionButton", style)
+		custom.set_stylebox(state, "CheckButton", style)
 	theme = custom
+
+func _setup_audio() -> void:
+	cue = AudioStreamPlayer.new()
+	var wave := AudioStreamWAV.new()
+	wave.format = AudioStreamWAV.FORMAT_16_BITS
+	wave.mix_rate = 22050
+	var samples := PackedByteArray()
+	samples.resize(4410)
+	for i in range(2205):
+		var value := int(sin(float(i) * TAU * 660.0 / 22050.0) * 1800 * (1.0 - float(i) / 2205.0))
+		samples.encode_s16(i * 2, value)
+	wave.data = samples
+	cue.stream = wave
+	add_child(cue)
+
+func _exit_tree() -> void:
+	if is_instance_valid(cue):
+		cue.stop()
+		cue.stream = null
 
 func _page() -> void:
 	for child in get_children():
+		if child == cue:
+			continue
 		remove_child(child)
 		child.queue_free()
 	var scroll := ScrollContainer.new()
@@ -69,6 +96,25 @@ func _page() -> void:
 	content.add_theme_constant_override("separation", 10)
 	margin.add_child(content)
 	_label(content, "JUNIOR ASTRONAUT   /   CONTROL DE MISIÓN", 17, ACCENT)
+
+func _preferences() -> void:
+	var motion := CheckButton.new()
+	motion.text = "Reducir movimiento"
+	motion.button_pressed = reduced_motion
+	motion.custom_minimum_size.y = 48
+	content.add_child(motion)
+	motion.toggled.connect(func(value: bool):
+		reduced_motion = value
+		for child in content.get_children():
+			if child is BaseView:
+				child.reduced_motion = value
+				child.queue_redraw())
+	var audio_option := CheckButton.new()
+	audio_option.text = "Sonido al ejecutar (opcional)"
+	audio_option.button_pressed = sound_enabled
+	audio_option.custom_minimum_size.y = 48
+	content.add_child(audio_option)
+	audio_option.toggled.connect(func(value: bool): sound_enabled = value)
 
 func _show_menu() -> void:
 	_page()
@@ -97,6 +143,7 @@ func _show_menu() -> void:
 		session.start(int(seed_input.value), str(scenario_picker.get_item_metadata(scenario_picker.selected))))
 	start_button.grab_focus()
 	_button(content, "Fuentes y créditos", _show_sources)
+	_preferences()
 	_label(content, "Simulación educativa • Sin cuentas • Sin conexión durante la partida", 17, MUTED)
 
 func _scenario_selected(index: int) -> void:
@@ -107,6 +154,10 @@ func _show_mission() -> void:
 	_page()
 	var state := session.state
 	_label(content, "SOL %d / 7 · %s · Semilla %d" % [state.sol, session.rules.config.scenarios[state.scenario_id].label, state.mission_seed], 28)
+	var base := BaseView.new()
+	base.state = state
+	base.reduced_motion = reduced_motion
+	content.add_child(base)
 	_label(content, "ENERGÍA  %d / %d     |     OXÍGENO  %d     |     ALIMENTOS  %d" % [state.energy, session.rules.config.battery_capacity, state.oxygen, state.food], 26, ACCENT)
 	_label(content, "Opcionales: hallazgos %d / %d · Muestras exteriores %d / 1. Sobrevivir completa la misión." % [state.science, session.rules.config.science_goal, state.samples], 17, MUTED)
 	var science_id: String = session.rules.config.scenarios[state.scenario_id].get("science_id", "")
@@ -139,13 +190,19 @@ func _show_mission() -> void:
 		action_detail = _label(content, "", 18, MUTED)
 		action_preview = _label(content, "", 18, ACCENT)
 		var expected_sol: int = state.sol
-		execute_button = _button(content, "Ejecutar plan y terminar sol →", func(): session.choose(selected_action, expected_sol))
+		execute_button = _button(content, "Ejecutar plan y terminar sol →", func():
+			if sound_enabled:
+				cue.play()
+			session.choose(selected_action, expected_sol))
 		action_picker.item_selected.connect(_action_selected)
 		_action_selected(action_picker.selected)
 		action_picker.grab_focus()
 		if not state.history.is_empty():
 			var last: Dictionary = state.history.back()
-			_label(content, "Último sol · %s: energía %+d, oxígeno %+d, comida %+d, ciencia %+d." % [session.rules.config.actions[last.action].label, last.energy, last.oxygen, last.food, last.science], 18, MUTED)
+			var changes := _label(content, "Último sol · %s: energía %+d, oxígeno %+d, comida %+d, ciencia %+d." % [session.rules.config.actions[last.action].label, last.energy, last.oxygen, last.food, last.science], 18, MUTED)
+			if not reduced_motion:
+				changes.modulate = Color("ffe2a3")
+				changes.create_tween().tween_property(changes, "modulate", Color.WHITE, 0.7)
 	_button(content, "Mostrar / ocultar bitácora completa", func(): log_text.visible = not log_text.visible)
 	log_text = _label(content, _history(), 18, MUTED)
 	log_text.visible = state.phase == MissionState.Phase.FINISHED
@@ -154,6 +211,7 @@ func _show_mission() -> void:
 	content.add_child(navigation)
 	_button(navigation, "Fuentes", _show_sources)
 	_button(navigation, "Menú", _show_menu)
+	_preferences()
 
 func _action_selected(index: int) -> void:
 	selected_action = str(action_picker.get_item_metadata(index))

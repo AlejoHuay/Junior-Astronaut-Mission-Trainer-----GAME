@@ -6,7 +6,7 @@ pendiente de medir con jugadores. Interfaz en español, sin cuentas ni APIs dura
 
 ## Estado actual
 
-**Fase 3 en curso: F3-02 implementada; siguiente F3-03 (base visual y accesibilidad).**
+**Fase 3 en curso: F3-03 implementada; siguiente F3-04 (tutorial y aprendizaje).**
 El usuario confirmó la revisión solicitada de Fase 2 el 15-11-2026. Es validación manual del
 usuario, separada de nuestras pruebas automatizadas. Fases 1 y 2 aceptadas.
 Aurora vincula su alerta ficticia con una llamarada histórica DONKI; fuentes disponibles sin red.
@@ -130,3 +130,4 @@ Cultivo acelerado, oxígeno de traslado y dos soles de radio son abstracciones e
 | F3-01 | Archivo DONKI original/curado, adaptador validado, Aurora trazable y fuentes | 684 aserciones, procedencia, escenas y exportación sin hilos pasan | F3-02 |
 
 | F3-02 | Ficha OSD-267 y muestra RadLab DosTel archivadas con contexto, límites y unidades | Tres archivos comprobados, 684 aserciones, escenas y exportación sin hilos pasan | F3-03 |
+| F3-03 | Base 2D original, módulos con estados escritos, animación breve, foco, sonido opcional y reducción de movimiento | 684 aserciones, escena y exportación sin hilos pasan; revisión visual pendiente | F3-04 |

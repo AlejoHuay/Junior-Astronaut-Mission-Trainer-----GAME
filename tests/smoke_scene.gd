@@ -9,6 +9,14 @@ func exercise_scene() -> void:
 	var screen = packed.instantiate()
 	root.add_child(screen)
 	await process_frame
+	# Preferences exercise both rendering paths without claiming audible/visual review.
+	for child in screen.content.get_children():
+		if child is CheckButton:
+			child.button_pressed = true
+	if not screen.reduced_motion or not screen.sound_enabled:
+		printerr("FAIL: presentation preference controls")
+		quit(1)
+		return
 	screen.session.start(214, "demo")
 	for action in ["grow", "grow", "support", "shelter", "combined", "eva", "support"]:
 		for index in range(screen.action_picker.item_count):
@@ -27,5 +35,6 @@ func exercise_scene() -> void:
 	await process_frame
 	screen.queue_free()
 	await process_frame
+	await create_timer(0.15).timeout
 	print("Scene smoke: scenario menu, plan selector, preview, execution, alert, objectives, result and sources loaded")
 	quit(0)
